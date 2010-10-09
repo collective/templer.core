@@ -1,13 +1,22 @@
 from setuptools import setup, find_packages
-import os
 
-version = '1.0-dev'
+version = '0.1a1-dev'
+
+long_description = (
+    open('README.txt').read()
+    + '\n' +
+    'Contributors\n'
+    '============\n'
+    + '\n' +
+    open('CONTRIBUTORS.txt').read()
+    + '\n' +
+    open('CHANGES.txt').read()
+    + '\n')
 
 setup(name='zopeskel.core',
       version=version,
       description="Core functionality for the zopeskel tool",
-      long_description=open("README.txt").read() + "\n" +
-                       open(os.path.join("docs", "HISTORY.txt")).read(),
+      long_description=long_description,
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",
           "Framework :: Zope2",
@@ -34,8 +43,20 @@ setup(name='zopeskel.core',
           'setuptools',
           "PasteScript>=1.7.2",
           "Cheetah>1.0,<=2.2.1",
-      ],
+      ],    
+      tests_require=[
+        'zope.testing',
+        'zc.buildout==1.4.3',
+        'Cheetah', 
+        'PasteScript'],
+      test_suite='zopeskel.core.tests.test_all.test_suite',
       entry_points="""
-      # -*- Entry points: -*-
-      """,
+        [paste.paster_create_template]
+        basic_namespace = zopeskel.core:BasicNamespace
+        nested_namespace = zopeskel.core:NestedNamespace
+        recipe = zopeskel.core:Recipe
+
+        [console_scripts]
+        zopeskel = zopeskel.core.zopeskel_script:run
+        """,
       )
