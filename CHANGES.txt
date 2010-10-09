@@ -1,0 +1,8 @@
+Changelog
+=========
+
+0.1a1 (unreleased)
+------------------
+
+- Package created by ZopeSkel
+  [Cris Ewing]
