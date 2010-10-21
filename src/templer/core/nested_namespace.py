@@ -1,9 +1,9 @@
 import copy
 
-from zopeskel.core.base import get_var
-from zopeskel.core.base import var, EXPERT, EASY
-from zopeskel.core.basic_namespace import BasicNamespace
-from zopeskel.core.vars import DottedVar
+from templer.core.base import get_var
+from templer.core.base import var, EXPERT, EASY
+from templer.core.basic_namespace import BasicNamespace
+from templer.core.vars import DottedVar
 
 VAR_NS2 = DottedVar(
             'namespace_package2', 

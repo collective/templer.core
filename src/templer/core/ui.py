@@ -4,7 +4,7 @@ interfaces, ie the console and the web interfaces.
 """
 import pkg_resources
 
-from zopeskel.core.base import BaseTemplate
+from templer.core.base import BaseTemplate
 
 # These are the "common" templates; they will be listed in a separate
 # list for new users. Please be conservative about adding new

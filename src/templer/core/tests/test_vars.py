@@ -2,15 +2,15 @@
 
 import unittest
 import sys
-from zopeskel.core.vars import var
-from zopeskel.core.vars import BooleanVar
-from zopeskel.core.vars import StringVar
-from zopeskel.core.vars import TextVar
-from zopeskel.core.vars import DottedVar
-from zopeskel.core.vars import OnOffVar
-from zopeskel.core.vars import IntVar
-from zopeskel.core.vars import BoundedIntVar
-from zopeskel.core.vars import ValidationException
+from templer.core.vars import var
+from templer.core.vars import BooleanVar
+from templer.core.vars import StringVar
+from templer.core.vars import TextVar
+from templer.core.vars import DottedVar
+from templer.core.vars import OnOffVar
+from templer.core.vars import IntVar
+from templer.core.vars import BoundedIntVar
+from templer.core.vars import ValidationException
 
 class test_var(unittest.TestCase):
     """ test that there is no default implementation of the validation method

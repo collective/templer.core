@@ -4,17 +4,17 @@ import unittest
 
 from paste.script.command import get_commands
 
-from zopeskel.core.base import BaseTemplate, get_var
-from zopeskel.core.vars import var
-from zopeskel.core.vars import BooleanVar
-from zopeskel.core.vars import StringVar
-from zopeskel.core.vars import TextVar
-from zopeskel.core.vars import DottedVar
-from zopeskel.core.vars import EXPERT
-from zopeskel.core.vars import EASY
-from zopeskel.core.basic_namespace import BasicNamespace
-from zopeskel.core.nested_namespace import NestedNamespace
-from zopeskel.core.recipe import Recipe
+from templer.core.base import BaseTemplate, get_var
+from templer.core.vars import var
+from templer.core.vars import BooleanVar
+from templer.core.vars import StringVar
+from templer.core.vars import TextVar
+from templer.core.vars import DottedVar
+from templer.core.vars import EXPERT
+from templer.core.vars import EASY
+from templer.core.basic_namespace import BasicNamespace
+from templer.core.nested_namespace import NestedNamespace
+from templer.core.recipe import Recipe
 
 class test_base_template(unittest.TestCase):
     """ test for methods on the base template class

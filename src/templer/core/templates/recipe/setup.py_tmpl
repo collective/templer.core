@@ -47,7 +47,7 @@ setup(name=${repr($project)},
         'Framework :: Buildout',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Build Tools',
-        #from zopeskel.core.base import LICENSE_CATEGORIES
+        #from templer.core.base import LICENSE_CATEGORIES
         #if $license_name.strip() in $LICENSE_CATEGORIES
         $repr($LICENSE_CATEGORIES[$license_name.strip()]),
         #end if

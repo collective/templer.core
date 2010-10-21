@@ -4,5 +4,9 @@ Changelog
 0.1a1 (unreleased)
 ------------------
 
+- Namespace for package changed to 'templer' to promote use by systems outside 
+  the Zope world
+  [Cris Ewing]
+
 - Package created by ZopeSkel
   [Cris Ewing]

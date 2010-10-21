@@ -208,7 +208,7 @@ def show_help():
 
 def show_version():
     try:
-        dist = pkg_resources.get_distribution('zopeskel.core')
+        dist = pkg_resources.get_distribution('templer.core')
         print dist.version
     except pkg_resources.DistributionNotFound:
         print 'unable to identify zopeskel version'

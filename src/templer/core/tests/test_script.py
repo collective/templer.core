@@ -4,8 +4,8 @@ import unittest
 import sys
 import StringIO
 
-from zopeskel.core.zopeskel_script import checkdots, process_args, run, DESCRIPTION
-from zopeskel.core.ui import list_sorted_templates
+from templer.core.zopeskel_script import checkdots, process_args, run, DESCRIPTION
+from templer.core.ui import list_sorted_templates
 
 
 def capture_stdout(function):

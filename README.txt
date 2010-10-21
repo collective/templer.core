@@ -3,31 +3,31 @@
 Introduction
 ============
 
-This package provides the core functionality of the ZopeSkel code generation 
-system.  Included are a base template class, utility scripts, the zopeskel 
+This package provides the core functionality of the templer code generation 
+system.  Included are a base template class, utility scripts, the templer 
 command-line wrapper and basic templates for namespace packages, nested 
 namespace packages and buildout recipes.
 
-All functionality of the ZopeSkel system is inherited from and extends 
+All functionality of the templer system is inherited from and extends 
 PasteScript_ templates.  Templates can be generated using the syntax of that
-package, but the zopeskel system provides a wrapper script to make it easier
+package, but the templer system provides a wrapper script to make it easier
 for developers to generate packages.
 
 .. _PasteScript: http://pythonpaste.org/script/
 
-zopeskel script
----------------
+templer script
+--------------
 
-This package provides a script, ``zopeskel``. The script acts as a wrapper for
+This package provides a script, ``templer``. The script acts as a wrapper for
 PasteScript's ``paster create``, hiding the newbie-error-prone syntax ff that 
-command. The ``zopeskel`` script also provides some inline error-checking for 
+command. The ``templer`` script also provides some inline error-checking for 
 project names and other variables as well as additional help. It is recommended 
 to use this script--especially for new users--rather than using ``paster create``
 directly. (The resulting packages produced, however, will be the same).
 
 For example, to create a new basic namespace package invoke the script like so::
 
-    zopeskel basic_namespace 
+    templer basic_namespace 
 
 This will prompt you to provide a name for your package.  The name you provide 
 will be validated to ensure that it fits with the number of namespaces expected 
@@ -45,17 +45,17 @@ prompt to recieve in-line assistance with the current question.
 Additional Script Functions
 ---------------------------
 
-In addition to interactively generating code, the zopeskel script provides a 
+In addition to interactively generating code, the templer script provides a 
 number of other useful functions:
 
     ``zopskel --help``
-      provides full listings of the help text for the zopeskel script.
+      provides full listings of the help text for the templer script.
 
-    ``zopeskel --list``
+    ``templer --list``
       provides a detailed list of the available templates
     
-    ``zopeskel --version``
-      provides the version number of the currently installed zopeskel package
+    ``templer --version``
+      provides the version number of the currently installed templer package
 
 Testing
 =======

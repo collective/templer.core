@@ -1,9 +1,9 @@
 import unittest
 
-from zopeskel.core.tests.test_base import test_suite as base_test_suite
-from zopeskel.core.tests.test_vars import test_suite as vars_test_suite
-from zopeskel.core.tests.test_script import test_suite as script_test_suite
-# from zopeskel.core.tests.test_templates import test_suite as doc_test_suite
+from templer.core.tests.test_base import test_suite as base_test_suite
+from templer.core.tests.test_vars import test_suite as vars_test_suite
+from templer.core.tests.test_script import test_suite as script_test_suite
+# from templer.core.tests.test_templates import test_suite as doc_test_suite
 
 def test_suite():
     """ wrap all tests in a single test suite, doctests must come last

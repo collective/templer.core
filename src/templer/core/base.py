@@ -10,9 +10,9 @@ from paste.script import copydir
 # from paste.script.templates import var as base_var
 from paste.script.command import BadCommand
 from paste.script.templates import BasicPackage
-from zopeskel.core.vars import var, BooleanVar, StringChoiceVar
-from zopeskel.core.vars import EASY, EXPERT, ALL
-from zopeskel.core.vars import ValidationException
+from templer.core.vars import var, BooleanVar, StringChoiceVar
+from templer.core.vars import EASY, EXPERT, ALL
+from templer.core.vars import ValidationException
 
 
 LICENSE_CATEGORIES = {

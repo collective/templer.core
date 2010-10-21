@@ -13,9 +13,9 @@ long_description = (
     open('CHANGES.txt').read()
     + '\n')
 
-setup(name='zopeskel.core',
+setup(name='templer.core',
       version=version,
-      description="Core functionality for the zopeskel tool",
+      description="Core functionality for the templer tool",
       long_description=long_description,
       classifiers=[
           "Development Status :: 2 - Pre-Alpha",
@@ -35,7 +35,7 @@ setup(name='zopeskel.core',
       license='GPL version 2',
       packages=find_packages('src'),
       package_dir={'': 'src'},
-      namespace_packages=['zopeskel'],
+      namespace_packages=['templer'],
       include_package_data=True,
       platforms = 'Any',
       zip_safe=False,
@@ -49,14 +49,14 @@ setup(name='zopeskel.core',
         'zc.buildout==1.4.3',
         'Cheetah', 
         'PasteScript'],
-      test_suite='zopeskel.core.tests.test_all.test_suite',
+      test_suite='templer.core.tests.test_all.test_suite',
       entry_points="""
         [paste.paster_create_template]
-        basic_namespace = zopeskel.core:BasicNamespace
-        nested_namespace = zopeskel.core:NestedNamespace
-        recipe = zopeskel.core:Recipe
+        basic_namespace = templer.core:BasicNamespace
+        nested_namespace = templer.core:NestedNamespace
+        recipe = templer.core:Recipe
 
         [console_scripts]
-        zopeskel = zopeskel.core.zopeskel_script:run
+        zopeskel = templer.core.zopeskel_script:run
         """,
       )
