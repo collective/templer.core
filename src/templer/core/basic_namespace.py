@@ -1,12 +1,12 @@
 import copy
 
-from zopeskel.core.vars import DottedVar
-from zopeskel.core.vars import StringVar
-from zopeskel.core.vars import BooleanVar
-from zopeskel.core.vars import TextVar
-from zopeskel.core.base import BaseTemplate
-from zopeskel.core.base import EASY
-from zopeskel.core.base import EXPERT
+from templer.core.vars import DottedVar
+from templer.core.vars import StringVar
+from templer.core.vars import BooleanVar
+from templer.core.vars import TextVar
+from templer.core.base import BaseTemplate
+from templer.core.base import EASY
+from templer.core.base import EXPERT
 
 
 class BasicNamespace(BaseTemplate):

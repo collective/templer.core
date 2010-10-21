@@ -1,7 +1,7 @@
 import copy
 
-from zopeskel.core.nested_namespace import NestedNamespace
-from zopeskel.core.base import get_var
+from templer.core.nested_namespace import NestedNamespace
+from templer.core.base import get_var
 
 class Recipe(NestedNamespace):
     """A template for buildout recipes"""

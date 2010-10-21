@@ -2,10 +2,11 @@ import sys
 import pkg_resources
 from cStringIO import StringIO
 from textwrap import TextWrapper
-from zopeskel.core.base import wrap_help_paras
+
 from paste.script.command import get_commands
 
-from zopeskel.core.ui import list_sorted_templates
+from templer.core.base import wrap_help_paras
+from templer.core.ui import list_sorted_templates
 
 USAGE = """
 Usage:
