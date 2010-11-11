@@ -55,6 +55,10 @@ setup(name='templer.core',
         basic_namespace = templer.core:BasicNamespace
         nested_namespace = templer.core:NestedNamespace
         recipe = templer.core:Recipe
+        
+        [templer.templer_structure]
+        bootstrap = templer.core.structures:BootstrapStructure
+        egg_docs = templer.core.structures:EggDocsStructure
 
         [console_scripts]
         zopeskel = templer.core.zopeskel_script:run
