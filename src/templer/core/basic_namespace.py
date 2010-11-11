@@ -5,8 +5,8 @@ from templer.core.vars import StringVar
 from templer.core.vars import BooleanVar
 from templer.core.vars import TextVar
 from templer.core.base import BaseTemplate
-from templer.core.base import EASY
-from templer.core.base import EXPERT
+from templer.core.vars import EASY
+from templer.core.vars import EXPERT
 
 
 class BasicNamespace(BaseTemplate):

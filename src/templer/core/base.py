@@ -1,5 +1,7 @@
 import os
 import sys
+import pkg_resources
+
 from textwrap import TextWrapper
 import ConfigParser
 from ConfigParser import SafeConfigParser
@@ -8,10 +10,14 @@ from paste.script import pluginlib
 from paste.script import templates
 from paste.script import copydir
 # from paste.script.templates import var as base_var
-from paste.script.command import BadCommand
-from paste.script.templates import BasicPackage
-from templer.core.vars import var, BooleanVar, StringChoiceVar
-from templer.core.vars import EASY, EXPERT, ALL
+# from paste.script.command import BadCommand
+# from paste.script.templates import BasicPackage
+# from templer.core.vars import var
+# from templer.core.vars import BooleanVar
+from templer.core.vars import StringChoiceVar
+# from templer.core.vars import EASY
+# from templer.core.vars import EXPERT
+from templer.core.vars import ALL
 from templer.core.vars import ValidationException
 
 
@@ -140,10 +146,10 @@ $HOME/.zopeskel file.
             commands.sort()
             longest = max([len(n) for n, c in commands])
             print_commands = []
-            for name, command in commands:
+            for name, this_command in commands:
                 name = name + ' ' * (longest - len(name))
-                print_commands.append('  %s  %s' % (name,
-                                                    command.load().summary))
+                print_commands.append('  %s  %s' % 
+                                        (name, this_command.load().summary))
             print_commands = '\n'.join(print_commands)
             print '-' * 78
             print """\
@@ -170,37 +176,29 @@ For more information: paster help COMMAND""" % print_commands
             print "\n" + '*'*74
             wrap_help_paras(textwrapper, msg)
             print '*'*74 + "\n"
-
+    
+    def all_structure_entry_points(self):
+        if not hasattr(self, '_structure_entry_points'):
+            self._structure_entry_points = list(pkg_resources.iter_entry_points(
+                'templer.templer_structure'))
+        return self._structure_entry_points
+    
+    def load_structure(self, name):
+        for ep in self.all_structure_entry_points():
+            if ep.name == name:
+                return ep.load()
+        raise LookupError('No entry point named %s available' % name)
+    
     def get_structures(self):
-        mod = sys.modules[self.__class__.__module__]
-        basepath = os.path.join(os.path.dirname(mod.__file__),'structures')
-        paths = []
-        for name in self.required_structures:
-            fullpath = os.path.join(basepath, name)
-            # only append paths that actually exist.  Parent classes should
-            # take care of earlier paths.  Is there a more elegant way to do 
-            # this?  It feels a bit kludgy. . .
-            if os.path.exists(fullpath):
-                paths.append(fullpath)
-        return paths
+        my_structures = []
+        for structure in self.required_structures:
+            my_structures.append(self.load_structure(structure))
+        return my_structures
 
     def write_structures(self, command, output_dir, vars):
-        structure_dirs = self.get_structures()
-        if len(structure_dirs) > 0:
-            if not os.path.exists(output_dir):
-                print "Creating directory %s" % output_dir
-                if not command.simulate:
-                    os.makedirs(output_dir)
-            for structure_dir in structure_dirs:
-                copydir.copy_dir(structure_dir, output_dir,
-                                 vars,
-                                 verbosity=0,
-                                 simulate=command.options.simulate,
-                                 interactive=command.interactive,
-                                 overwrite=command.options.overwrite,
-                                 indent=1,
-                                 use_cheetah=self.use_cheetah,
-                                 template_renderer=self.template_renderer)
+        structures = self.get_structures()
+        for structure in structures:
+            structure().write_files(command, output_dir, vars)
 
     def pre(self, *args, **kwargs):
         templates.Template.pre(self, *args, **kwargs)

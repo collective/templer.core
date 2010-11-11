@@ -1,7 +1,7 @@
 import copy
 
 from templer.core.base import get_var
-from templer.core.base import var, EXPERT, EASY
+from templer.core.vars import var, EXPERT, EASY
 from templer.core.basic_namespace import BasicNamespace
 from templer.core.vars import DottedVar
 
