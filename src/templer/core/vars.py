@@ -97,7 +97,8 @@ class StringChoiceVar(var):
     _default_widget = 'select'
 
     def __init__(self, *args, **kwargs):
-        self.choices = kwargs['choices']
+        normalized_choices = [c.lower() for c in kwargs['choices']]
+        self.choices = normalized_choices
         del kwargs['choices']
         super(StringChoiceVar, self).__init__(*args, **kwargs)
 
