@@ -59,6 +59,10 @@ setup(name='templer.core',
         [templer.templer_structure]
         bootstrap = templer.core.structures:BootstrapStructure
         egg_docs = templer.core.structures:EggDocsStructure
+        gpl = templer.core.structures:GPLStructure
+        gpl3 = templer.core.structures:GPL3Structure
+        efl = templer.core.structures:EFLStructure
+        asl = templer.core.structures:ASLStructure
 
         [console_scripts]
         zopeskel = templer.core.zopeskel_script:run
