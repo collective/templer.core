@@ -50,3 +50,23 @@ class BootstrapStructure(Structure):
 class EggDocsStructure(Structure):
     
     _structure_dir = 'structures/egg_docs'
+
+
+class GPLStructure(Structure):
+    
+    _structure_dir = 'structures/licenses/gpl2'
+
+
+class GPL3Structure(Structure):
+    
+    _structure_dir = 'structures/licenses/gpl3'
+
+
+class EFLStructure(Structure):
+    
+    _structure_dir = 'structures/licenses/efl'
+
+
+class ASLStructure(Structure):
+    
+    _structure_dir = 'structures/licenses/asl'

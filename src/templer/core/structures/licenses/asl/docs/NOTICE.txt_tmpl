@@ -1,0 +1,31 @@
+=========================================================================
+==  Example NOTICE file for use with the Apache License, Version 2.0,  ==
+=========================================================================
+
+${project}
+Copyright 1999-2006 ${author}
+
+THE FOLLOWING IS AN EXAMPLE OF THE CONTENT THIS FILE SHOULD CONTAIN. WRITE
+STATEMENTS OF PROVENANCE FOR THE SOFTWARE IN THIS PACKAGE, ONE PER PARAGRAPH.
+THESE SAMPLE LINES SHOULD BE REMOVED, AS THEY ARE FOR THE APACHE 2.0 HTTP
+SERVER, NOT YOUR OWN SOFTWARE :)
+
+****** SAMPLE ********
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Portions of this software were developed at the National Center
+for Supercomputing Applications (NCSA) at the University of
+Illinois at Urbana-Champaign.
+
+This software contains code derived from the RSA Data Security
+Inc. MD5 Message-Digest Algorithm, including various
+modifications by Spyglass Inc., Carnegie Mellon University, and
+Bell Communications Research, Inc (Bellcore).
+
+Regular expression support is provided by the PCRE library package,
+which is open source software, written by Philip Hazel, and copyright
+by the University of Cambridge, England. The original software is
+available from
+   ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+******** END SAMPLE ********
