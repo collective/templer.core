@@ -1,5 +1,4 @@
 import os
-import sys
 import pkg_resources
 
 from textwrap import TextWrapper
@@ -8,33 +7,26 @@ from ConfigParser import SafeConfigParser
 from paste.script import command
 from paste.script import pluginlib
 from paste.script import templates
-from paste.script import copydir
-# from paste.script.templates import var as base_var
-# from paste.script.command import BadCommand
-# from paste.script.templates import BasicPackage
-# from templer.core.vars import var
-# from templer.core.vars import BooleanVar
+
 from templer.core.vars import StringChoiceVar
-# from templer.core.vars import EASY
-# from templer.core.vars import EXPERT
 from templer.core.vars import ALL
 from templer.core.vars import ValidationException
 
 
 LICENSE_CATEGORIES = {
-    'DFSG' : 'License :: DFSG approved',
-    'EFS' : 'License :: Eiffel Forum License (EFL)',
-    'NPL' : 'License :: Netscape Public License (NPL)',
+    'EFL' : 'License :: Eiffel Forum License (EFL)',
+    # 'NPL' : 'License :: Netscape Public License (NPL)',
     'ASL' : 'License :: OSI Approved :: Apache Software License',
-    'BSD' : 'License :: OSI Approved :: BSD License',
-    'FDL' : 'License :: OSI Approved :: GNU Free Documentation License (FDL)',
+    # 'BSD' : 'License :: OSI Approved :: BSD License',
+    # 'FDL' : 'License :: OSI Approved :: GNU Free Documentation License (FDL)',
     'GPL' : 'License :: OSI Approved :: GNU General Public License (GPL)',
-    'LGPL' : 'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
-    'MIT' : 'License :: OSI Approved :: MIT License',
-    'MPL' : 'License :: OSI Approved :: Mozilla Public License 1.0 (MPL)',
-    'MPL11' : 'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
-    'QPL' : 'License :: OSI Approved :: Qt Public License (QPL)',
-    'ZPL' : 'License :: OSI Approved :: Zope Public License',
+    'GPL3' : 'License :: OSI Approved :: GNU General Public License (GPL)',
+    # 'LGPL' : 'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
+    # 'MIT' : 'License :: OSI Approved :: MIT License',
+    # 'MPL' : 'License :: OSI Approved :: Mozilla Public License 1.0 (MPL)',
+    # 'MPL11' : 'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
+    # 'QPL' : 'License :: OSI Approved :: Qt Public License (QPL)',
+    # 'ZPL' : 'License :: OSI Approved :: Zope Public License',
     }
 
 
@@ -177,6 +169,12 @@ For more information: paster help COMMAND""" % print_commands
             wrap_help_paras(textwrapper, msg)
             print '*'*74 + "\n"
     
+    def readable_license_options(self):
+        output = ["The following licenses are available:\n",]
+        for key, classifier in LICENSE_CATEGORIES.items():
+            output.append("  %s --\n    %s\n" % (key, classifier))
+        return "\n".join(output)
+    
     def all_structure_entry_points(self):
         if not hasattr(self, '_structure_entry_points'):
             self._structure_entry_points = list(pkg_resources.iter_entry_points(
@@ -187,16 +185,23 @@ For more information: paster help COMMAND""" % print_commands
         for ep in self.all_structure_entry_points():
             if ep.name == name:
                 return ep.load()
-        raise LookupError('No entry point named %s available' % name)
+        raise LookupError('No entry point for structure %s available' % name)
     
-    def get_structures(self):
+    def get_license(self, vars):
+        if 'license_name' in vars.keys():
+            my_license = vars['license_name'].lower()
+            return self.load_structure(my_license)
+    
+    def get_structures(self, vars):
         my_structures = []
         for structure in self.required_structures:
             my_structures.append(self.load_structure(structure))
+        # append the chosen license structure, if applicable
+        my_structures.append(self.get_license(vars))
         return my_structures
 
     def write_structures(self, command, output_dir, vars):
-        structures = self.get_structures()
+        structures = self.get_structures(vars)
         for structure in structures:
             structure().write_files(command, output_dir, vars)
 
