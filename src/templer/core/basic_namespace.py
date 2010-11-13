@@ -1,12 +1,15 @@
 import copy
 
+from templer.core.base import BaseTemplate
+from templer.core.base import LICENSE_CATEGORIES
 from templer.core.vars import DottedVar
 from templer.core.vars import StringVar
+from templer.core.vars import StringChoiceVar
 from templer.core.vars import BooleanVar
 from templer.core.vars import TextVar
-from templer.core.base import BaseTemplate
 from templer.core.vars import EASY
 from templer.core.vars import EXPERT
+
 
 
 class BasicNamespace(BaseTemplate):
@@ -153,20 +156,24 @@ It will be used in the egg's setup.py.
 """
             ),
 
-        StringVar(
+        StringChoiceVar(
             'license_name',
             title='Project License',
             description='Name of license for the project',
             default='GPL',
             modes=(),
             page='Metadata',
+            choices=LICENSE_CATEGORIES.keys(),
             help="""
 The license that this project is issued under. It will be used in the
 egg's setup.py.
 
 Common choices here are 'GPL' (for the GNU General Public License),
 'ZPL' (for the Zope Public License', and 'BSD' (for the BSD license).
-"""
+
+%s
+
+""" % BaseTemplate('null').readable_license_options()
             ),
 
         BooleanVar(
