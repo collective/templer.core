@@ -1,0 +1,4 @@
+#from datetime import date
+#set $today = date.today()
+${project} Copyright $today.year, ${author}
+Licensed under the Eiffel Forum License 2.

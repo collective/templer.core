@@ -1,9 +1,11 @@
+#from datetime import date
+#set $today = date.today()
 =========================================================================
 ==  Example NOTICE file for use with the Apache License, Version 2.0,  ==
 =========================================================================
 
 ${project}
-Copyright 1999-2006 ${author}
+Copyright $today.year ${author}
 
 THE FOLLOWING IS AN EXAMPLE OF THE CONTENT THIS FILE SHOULD CONTAIN. WRITE
 STATEMENTS OF PROVENANCE FOR THE SOFTWARE IN THIS PACKAGE, ONE PER PARAGRAPH.
