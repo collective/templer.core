@@ -8,6 +8,34 @@ Use paster::
     paster create -t basic_namespace plone.example --no-interactive
     ...
 
+Check the top-level package structure::
+
+    >>> top_dir = os.path.join('plone.example',)
+    >>> ls(top_dir)
+    CHANGES.txt
+    CONTRIBUTORS.txt
+    README.txt
+    docs
+    plone
+    plone.example.egg-info
+    setup.py
+
+The default license for our this template is the GPL, make sure that the GPL is 
+the license that was actually created::
+
+    >>> license_dir = os.path.join('plone.example', 'docs')
+    >>> ls(license_dir)
+    LICENSE.GPL
+    LICENSE.txt
+
+Let's look at the generated LICENSE.txt file to make sure that our author name
+and the correct package name and date were written in::
+    >>> cat(license_dir, 'LICENSE.txt')
+    plone.example Copyright 2010, <YOUR NAME HERE>
+    <BLANKLINE>
+    ...
+
+
 Let's check the content::
 
     >>> package_dir = os.path.join('plone.example', 
