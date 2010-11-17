@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1a1-dev'
+version = '0.1b-dev'
 
 long_description = (
     open('README.txt').read()
@@ -18,15 +18,17 @@ setup(name='templer.core',
       description="Core functionality for the templer tool",
       long_description=long_description,
       classifiers=[
-          "Development Status :: 2 - Pre-Alpha",
-          "Framework :: Zope2",
-          "Framework :: Zope3",
-          "Framework :: Plone",
-          "Intended Audience :: Developers",
-          "License :: OSI Approved :: GNU General Public License (GPL)",
-          "Programming Language :: Python",
-          "Topic :: Internet :: WWW/HTTP",
-          "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+        "Development Status :: 4 - Beta",
+        "Framework :: Zope2",
+        "Framework :: Zope3",
+        "Framework :: Plone",
+        "Framework :: Buildout",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
+        "Programming Language :: Python",
+        "Topic :: Internet :: WWW/HTTP",
+        "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+        "Topic :: Software Development :: Code Generators",
        ],
       keywords='web zope command-line skeleton project',
       author='Cris Ewing',
