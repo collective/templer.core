@@ -45,7 +45,6 @@ setup(name='templer.core',
           "Cheetah>1.0,<=2.2.1",
       ],    
       tests_require=[
-        'zope.testing',
         'zc.buildout==1.4.3',
         'Cheetah', 
         'PasteScript'],
