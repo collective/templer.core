@@ -1,6 +1,6 @@
 #from datetime import date
 #set $today = date.today()
-#set #no_author = <YOUR NAME HERE>
+#set #no_author = '<YOUR NAME HERE>'
 Copyright (c)  $today.year, ${$author or $no_author}.
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3

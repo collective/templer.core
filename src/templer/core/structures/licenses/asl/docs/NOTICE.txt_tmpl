@@ -1,6 +1,6 @@
 #from datetime import date
 #set $today = date.today()
-#set #no_author = <YOUR NAME HERE>
+#set #no_author = '<YOUR NAME HERE>'
 =========================================================================
 ==  Example NOTICE file for use with the Apache License, Version 2.0,  ==
 =========================================================================

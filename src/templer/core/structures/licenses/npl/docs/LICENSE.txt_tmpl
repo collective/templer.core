@@ -10,5 +10,5 @@ specific language governing rights and limitations under the License.
 
 The Original Code is ${project}.
 
-The Initial Developer of the Original Code is ${author}.
+The Initial Developer of the Original Code is ${$author or $no_author}.
 Copyright (C) $today.year, All Rights Reserved.
