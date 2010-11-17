@@ -1,0 +1,18 @@
+=========================
+nested_namespace template
+=========================
+
+Use paster::
+
+    >>> paster('create -t nested_namespace plone.app.example --no-interactive')
+    paster create -t nested_namespace plone.app.example --no-interactive
+    ...
+
+Let's check the content::
+
+    >>> package_dir = os.path.join('plone.app.example', 
+    ...                            'plone', 'app', 'example')
+    >>> ls(package_dir)
+    __init__.py
+    
+

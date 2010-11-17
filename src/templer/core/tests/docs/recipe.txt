@@ -1,0 +1,63 @@
+===============
+recipe template
+===============
+
+Use paster::
+
+    >>> paster('create -t recipe plone.recipe.example --no-interactive')
+    paster create -t recipe plone.recipe.example --no-interactive
+    ...
+
+Let's check the content::
+
+    >>> package_dir = os.path.join('plone.recipe.example', 
+    ...                            'plone', 'recipe', 'example')
+    >>> ls(package_dir)
+    README.txt
+    __init__.py
+    tests
+
+Let's check how the recipe looks like::
+
+    >>> recipe = open(os.path.join(package_dir, '__init__.py')).read()
+    >>> print recipe
+    # -*- coding: utf-8 -*-
+    """Recipe example"""
+    <BLANKLINE>
+    class Recipe(object):
+        """zc.buildout recipe"""
+    <BLANKLINE>
+        def __init__(self, buildout, name, options):
+            self.buildout, self.name, self.options = buildout, name, options
+    <BLANKLINE>
+        def install(self):
+            """Installer"""
+            # XXX Implement recipe functionality here
+    <BLANKLINE>
+            # Return files that were created by the recipe. The buildout
+            # will remove all returned files upon reinstall.
+        return tuple()
+    <BLANKLINE>
+        def update(self):
+            """Updater"""
+            pass
+
+Now let's try to run the recipe own tests::
+
+    >>> recipe_dir = 'plone.recipe.example'
+    >>> cd(recipe_dir)
+    >>> import sys
+    >>> python_ = sys.executable
+    >>> res = read_sh('%s setup.py test' % python_)
+    >>> 'doctest: readme.txt ... ok' in res.strip().lower()
+    True
+
+And the dedicated buildout `test` script (to be fixed)::
+
+    >> null = os.chdir(recipe_dir)
+    >> null = read_sh('%s bootstrap.py' % python_)
+    >> null = read_sh(os.path.join('bin', 'buildout'))
+    >> res = read_sh(os.path.join('bin', 'test'))
+    >> print res
+
+

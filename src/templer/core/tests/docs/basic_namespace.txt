@@ -1,0 +1,18 @@
+========================
+basic_namespace template
+========================
+
+Use paster::
+
+    >>> paster('create -t basic_namespace plone.example --no-interactive')
+    paster create -t basic_namespace plone.example --no-interactive
+    ...
+
+Let's check the content::
+
+    >>> package_dir = os.path.join('plone.example', 
+    ...                            'plone', 'example')
+    >>> ls(package_dir)
+    __init__.py
+    
+
