@@ -1,4 +1,5 @@
 #from datetime import date
 #set $today = date.today()
-${project} Copyright $today.year, ${author}
+#set #no_author = <YOUR NAME HERE>
+${project} Copyright $today.year, ${$author or $no_author}
 Licensed under the Eiffel Forum License 2.

@@ -1,6 +1,7 @@
 #from datetime import date
 #set $today = date.today()
-Copyright (c) $today.year, ${author}
+#set #no_author = <YOUR NAME HERE>
+Copyright (c) $today.year, ${$author or $no_author}
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
