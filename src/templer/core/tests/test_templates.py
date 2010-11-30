@@ -105,10 +105,6 @@ def doc_suite(test_dir, setUp=testSetUp, tearDown=testTearDown, globs=None):
     flags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE |
              doctest.REPORT_ONLY_FIRST_FAILURE)
 
-    # package_dir = os.path.split(test_dir)[0]
-    # if package_dir not in sys.path:
-    #     sys.path.append(package_dir)
-
     doctest_dir = os.path.join(test_dir, 'docs')
 
     # filtering files on extension
@@ -126,8 +122,6 @@ def doc_suite(test_dir, setUp=testSetUp, tearDown=testTearDown, globs=None):
 def test_suite():
     """returns the test suite"""
     suite = doc_suite(current_dir)
-    # suite.layer = ZopeSkelLayer
-    # 
     return suite
 
 if __name__ == '__main__':
