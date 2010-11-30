@@ -4,6 +4,10 @@ Changelog
 0.1a1 (unreleased)
 ------------------
 
+- Added structure system for better isolation of shared structural elements and
+  improved maintainability
+  [Cris Ewing]
+
 - Namespace for package changed to 'templer' to promote use by systems outside 
   the Zope world
   [Cris Ewing]

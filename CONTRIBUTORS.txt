@@ -1,1 +1,16 @@
 - Cris Ewing, original author
+
+Based on code from zopeskel, contributors to which include:
+
+- Daniel Nouri
+- Tarek Ziadé
+- Mustapha Benali
+- Sylvain Viollon
+- Alan Hoey
+- Josh Johnson
+- Emanuel Sartor
+- Matthew Wilkes
+- Joel Burton
+- Cris Ewing
+- Chris Calloway
+- Chris Rossi
