@@ -60,10 +60,18 @@ setup(name='templer.core',
         [templer.templer_structure]
         bootstrap = templer.core.structures:BootstrapStructure
         egg_docs = templer.core.structures:EggDocsStructure
+        asl = templer.core.structures:ASLStructure
+        bsd = templer.core.structures:BSDStructure
+        efl = templer.core.structures:EFLStructure
+        fdl = templer.core.structures:FDLStructure
         gpl = templer.core.structures:GPLStructure
         gpl3 = templer.core.structures:GPL3Structure
-        efl = templer.core.structures:EFLStructure
-        asl = templer.core.structures:ASLStructure
+        lgpl = templer.core.structures:LGPLStructure
+        mit = templer.core.structures:MITStructure
+        mpl = templer.core.structures:MPLStructure
+        mpl11 = templer.core.structures:MPL11Structure
+        npl = templer.core.structures:NPLStructure
+        zpl = templer.core.structures:ZPLStructure
 
         [console_scripts]
         zopeskel = templer.core.zopeskel_script:run

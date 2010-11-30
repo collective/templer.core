@@ -43,30 +43,57 @@ class Structure(object):
 
 
 class BootstrapStructure(Structure):
-    
     _structure_dir = 'structures/bootstrap'
 
 
 class EggDocsStructure(Structure):
-    
     _structure_dir = 'structures/egg_docs'
 
 
+class ASLStructure(Structure):
+    _structure_dir = 'structures/licenses/asl'
+
+
+class BSDStructure(Structure):
+    _structure_dir = 'structures/licenses/bsd'
+
+
+class EFLStructure(Structure):
+    _structure_dir = 'structures/licenses/efl'
+
+
+class FDLStructure(Structure):
+    _structure_dir = 'structures/licenses/fdl'
+
+
 class GPLStructure(Structure):
-    
     _structure_dir = 'structures/licenses/gpl2'
 
 
 class GPL3Structure(Structure):
-    
     _structure_dir = 'structures/licenses/gpl3'
 
 
-class EFLStructure(Structure):
-    
-    _structure_dir = 'structures/licenses/efl'
+class LGPLStructure(Structure):
+    _structure_dir = 'structures/licenses/lgpl'
 
 
-class ASLStructure(Structure):
-    
-    _structure_dir = 'structures/licenses/asl'
+class MITStructure(Structure):
+    _structure_dir = 'structures/licenses/mit'
+
+
+class MPLStructure(Structure):
+    _structure_dir = 'structures/licenses/mpl'
+
+
+class MPL11Structure(Structure):
+    _structure_dir = 'structures/licenses/mpl11'
+
+
+class NPLStructure(Structure):
+    _structure_dir = 'structures/licenses/npl'
+
+
+class ZPLStructure(Structure):
+    _structure_dir = 'structures/licenses/zpl'
+
