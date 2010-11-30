@@ -14,10 +14,9 @@ from templer.core.vars import ValidationException
 
 
 LICENSE_CATEGORIES = {
-    'EFL' : 'License :: Eiffel Forum License (EFL)',
-    'NPL' : 'License :: Netscape Public License 1.1 (NPL)',
     'ASL' : 'License :: OSI Approved :: Apache Software License',
     'BSD' : 'License :: OSI Approved :: BSD License',
+    'EFL' : 'License :: Eiffel Forum License (EFL)',
     'FDL' : 'License :: OSI Approved :: GNU Free Documentation License (FDL)',
     'GPL' : 'License :: OSI Approved :: GNU General Public License (GPL)',
     'GPL3' : 'License :: OSI Approved :: GNU General Public License (GPL)',
@@ -25,6 +24,7 @@ LICENSE_CATEGORIES = {
     'MIT' : 'License :: OSI Approved :: MIT License',
     'MPL' : 'License :: OSI Approved :: Mozilla Public License 1.0 (MPL)',
     'MPL11' : 'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
+    'NPL' : 'License :: Netscape Public License 1.1 (NPL)',
     'ZPL' : 'License :: OSI Approved :: Zope Public License',
     }
 
