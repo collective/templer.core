@@ -35,7 +35,7 @@ long_description = (
 entry_point = '$namespace_package.$namespace_package2.${package}:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}
 
-tests_require = ['zope.testing', 'zc.buildout']
+tests_require = ['zope.testing', 'zc.buildout==1.4.3']
 
 setup(name=${repr($project)},
       version=version,
@@ -62,7 +62,7 @@ setup(name=${repr($project)},
       include_package_data=True,
       zip_safe=${repr(bool($zip_safe)) or False},
       install_requires=['setuptools',
-                        'zc.buildout'
+                        'zc.buildout==1.4.3'
                         # -*- Extra requirements: -*-
                         ],
       tests_require=tests_require,
