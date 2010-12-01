@@ -1,7 +1,7 @@
 #from datetime import date
 #set $today = date.today()
-#set #no_author = '<YOUR NAME HERE>'
-Copyright (c) $today.year ${$author or $no_author}.
+#set $no_author = '<YOUR NAME HERE>'
+${project} Copyright (c) $today.year ${$author or $no_author}.
 All Rights Reserved.
 
 This software is subject to the provisions of the Zope Public License,
