@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-version = '0.1b-dev'
+version = '1.0b-dev'
 
 long_description = (
     open('README.txt').read()
@@ -26,6 +26,9 @@ setup(name='templer.core',
         "Intended Audience :: Developers",
         "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
+        'Programming Language :: Python :: 2.4',
+        'Programming Language :: Python :: 2.5',
+        'Programming Language :: Python :: 2.6',
         "Topic :: Internet :: WWW/HTTP",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
         "Topic :: Software Development :: Code Generators",
