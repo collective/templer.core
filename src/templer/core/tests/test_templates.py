@@ -2,12 +2,14 @@
 __docformat__ = 'restructuredtext'
 
 import unittest
-import doctest
+# import doctest
 import sys
 import os
 import shutil
 import popen2
 import tempfile
+
+from zope.testing import doctest
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
