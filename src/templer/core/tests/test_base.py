@@ -14,7 +14,6 @@ from templer.core.vars import EXPERT
 from templer.core.vars import EASY
 from templer.core.basic_namespace import BasicNamespace
 from templer.core.nested_namespace import NestedNamespace
-# from templer.core.recipe import Recipe
 
 class test_base_template(unittest.TestCase):
     """ test for methods on the base template class
@@ -127,7 +126,7 @@ class test_base_template(unittest.TestCase):
     
     def test_get_template_stack(self):
         """ verify that running this command against a create command
-            with the argument '-t recipe' returns the expected vals
+            with the argument '-t nested_namespace' returns the expected vals
         """
         stack = self.template.get_template_stack(self.command)
         self.assertEqual(len(stack), 1)

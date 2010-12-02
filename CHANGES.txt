@@ -4,6 +4,9 @@ Changelog
 1.0b-dev (unreleased)
 ---------------------
 
+- Moved zc.buildout template recipe into new package templer.buildout
+  [Cris Ewing]
+
 - Improved consistency of how templates treat 'long_description' in setup.py
   [Cris Ewing]
 

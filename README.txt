@@ -3,10 +3,10 @@
 Introduction
 ============
 
-This package provides the core functionality of the templer code generation 
-system.  Included are a base template class, utility scripts, the templer 
-command-line wrapper and basic templates for namespace packages, nested 
-namespace packages and buildout recipes.
+This package provides the core functionality of the templer code generation
+system. Included are a base template class, utility scripts, the templer
+command-line wrapper and basic templates for basic python namespace packages and
+nested namespace packages.
 
 All functionality of the templer system is inherited from and extends 
 PasteScript_ templates.  Templates can be generated using the syntax of that
@@ -19,7 +19,7 @@ templer script
 --------------
 
 This package provides a script, ``templer``. The script acts as a wrapper for
-PasteScript's ``paster create``, hiding the newbie-error-prone syntax ff that
+PasteScript's ``paster create``, hiding the newbie-error-prone syntax of that
 command. The ``templer`` script also provides some inline error-checking for
 project names and other variables as well as additional help. It is recommended
 to use this script--especially for new users--rather than using ``paster

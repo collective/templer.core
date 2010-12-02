@@ -39,7 +39,7 @@ class TestLicenses(unittest.TestCase):
         }
         create = get_commands()['create'].load()
         command = create('create')
-        command.parse_args(['-t', 'recipe'])
+        command.parse_args(['-t', 'nested_namespace'])
         self.command = command
         self.command.interactive = False
         self.tempdir = tempfile.mkdtemp()
