@@ -14,7 +14,7 @@ from templer.core.vars import EXPERT
 from templer.core.vars import EASY
 from templer.core.basic_namespace import BasicNamespace
 from templer.core.nested_namespace import NestedNamespace
-from templer.core.recipe import Recipe
+# from templer.core.recipe import Recipe
 
 class test_base_template(unittest.TestCase):
     """ test for methods on the base template class
@@ -41,7 +41,7 @@ class test_base_template(unittest.TestCase):
         self.template = BaseTemplate('my_name')
         create = get_commands()['create'].load()
         command = create('create')
-        command.parse_args(['-t', 'recipe'])
+        command.parse_args(['-t', 'nested_namespace'])
         self.command = command
 
     def test_filter_for_modes(self):
@@ -122,7 +122,7 @@ class test_base_template(unittest.TestCase):
         stack = self.template.get_template_stack(self.command)
         self.assertRaises(ValueError, self.template.get_position_in_stack, stack)
         
-        new_template = Recipe('joe')
+        new_template = NestedNamespace('joe')
         self.assertEqual(new_template.get_position_in_stack(stack), len(stack)-1)
     
     def test_get_template_stack(self):
@@ -130,11 +130,11 @@ class test_base_template(unittest.TestCase):
             with the argument '-t recipe' returns the expected vals
         """
         stack = self.template.get_template_stack(self.command)
-        self.assertEqual(len(stack), 2)
+        self.assertEqual(len(stack), 1)
         
         self.failIf(self.template.__class__ in
                     [t.__class__ for t in stack], "%s" % stack)
-        new_template = Recipe('joe')
+        new_template = NestedNamespace('joe')
         self.failUnless(new_template.__class__ in
                         [t.__class__ for t in stack], "%s" % stack)
     
@@ -147,14 +147,12 @@ class test_base_template(unittest.TestCase):
         """
         b_template = BasicNamespace('tom')
         n_template = NestedNamespace('bob')
-        r_template = Recipe('joe')
-        # pretend the recipe template provides localcommands (it doesn't have 
-        # to actually provide them, just claim that it does)
-        r_template.use_local_commands = True
+        # pretend the nested_namespace template provides localcommands (it 
+        # doesn't have to actually provide them, just claim that it does)
+        n_template.use_local_commands = True
         
         self.failIf(b_template.should_print_subcommands(self.command))
-        self.failIf(n_template.should_print_subcommands(self.command))
-        self.failUnless(r_template.should_print_subcommands(self.command))
+        self.failUnless(n_template.should_print_subcommands(self.command))
 
 
 def test_suite():

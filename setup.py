@@ -58,7 +58,6 @@ setup(name='templer.core',
         [paste.paster_create_template]
         basic_namespace = templer.core:BasicNamespace
         nested_namespace = templer.core:NestedNamespace
-        recipe = templer.core:Recipe
         
         [templer.templer_structure]
         bootstrap = templer.core.structures:BootstrapStructure

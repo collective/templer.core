@@ -9,6 +9,7 @@ class Structure(object):
     # _structure_dir (or structure_dir())
     use_cheetah = True
     template_renderer = None
+    _structure_dir = None
     
     def module_dir(self):
         """Returns the module directory of this template."""
@@ -40,10 +41,6 @@ class Structure(object):
                                  indent=1,
                                  use_cheetah=self.use_cheetah,
                                  template_renderer=self.template_renderer)
-
-
-class BootstrapStructure(Structure):
-    _structure_dir = 'structures/bootstrap'
 
 
 class EggDocsStructure(Structure):
