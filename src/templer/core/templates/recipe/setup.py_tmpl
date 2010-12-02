@@ -15,22 +15,19 @@ long_description = (
     read('README.txt')
     + '\n' +
     'Detailed Documentation\n'
-    '**********************\n'
+    '======================\n'
     + '\n' +
     read(${repr($namespace_package)}, ${repr($namespace_package2)}, ${repr($package)}, 'README.txt')
     + '\n' +
     'Contributors\n'
-    '************\n'
+    '============\n'
     + '\n' +
     read('CONTRIBUTORS.txt')
-    + '\n' +
-    'Change history\n'
-    '**************\n'
     + '\n' +
     read('CHANGES.txt')
     + '\n' +
    'Download\n'
-    '********\n')
+   '========\n')
 
 entry_point = '$namespace_package.$namespace_package2.${package}:Recipe'
 entry_points = {"zc.buildout": ["default = %s" % entry_point]}

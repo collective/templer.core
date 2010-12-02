@@ -3,11 +3,21 @@ import os
 
 version = ${repr($version) or "0.0"}
 
+long_description = (
+    open('README.txt').read()
+    + '\n' +
+    'Contributors\n'
+    '============\n'
+    + '\n' +
+    open('CONTRIBUTORS.txt').read()
+    + '\n' +
+    open('CHANGES.txt').read()
+    + '\n')
+
 setup(name=${repr($project)},
       version=version,
       description="${description or None}",
-      long_description=open("README.txt").read() + "\n" +
-                       open("CHANGES.txt").read(),
+      long_description=long_description,
       # Get more strings from
       # http://pypi.python.org/pypi?%3Aaction=list_classifiers
       classifiers=[
