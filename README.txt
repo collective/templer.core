@@ -19,11 +19,11 @@ templer script
 --------------
 
 This package provides a script, ``templer``. The script acts as a wrapper for
-PasteScript's ``paster create``, hiding the newbie-error-prone syntax ff that 
-command. The ``templer`` script also provides some inline error-checking for 
-project names and other variables as well as additional help. It is recommended 
-to use this script--especially for new users--rather than using ``paster create``
-directly. (The resulting packages produced, however, will be the same).
+PasteScript's ``paster create``, hiding the newbie-error-prone syntax ff that
+command. The ``templer`` script also provides some inline error-checking for
+project names and other variables as well as additional help. It is recommended
+to use this script--especially for new users--rather than using ``paster
+create`` directly. (The resulting packages produced, however, will be the same).
 
 For example, to create a new basic namespace package invoke the script like so::
 
@@ -48,7 +48,7 @@ Additional Script Functions
 In addition to interactively generating code, the templer script provides a 
 number of other useful functions:
 
-    ``zopskel --help``
+    ``templer --help``
       provides full listings of the help text for the templer script.
 
     ``templer --list``

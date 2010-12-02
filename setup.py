@@ -77,6 +77,6 @@ setup(name='templer.core',
         zpl = templer.core.structures:ZPLStructure
 
         [console_scripts]
-        zopeskel = templer.core.zopeskel_script:run
+        templer = templer.core.zopeskel_script:run
         """,
       )

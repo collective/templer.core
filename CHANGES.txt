@@ -1,8 +1,18 @@
 Changelog
 =========
 
-0.1a1 (unreleased)
-------------------
+1.0b-dev (unreleased)
+---------------------
+
+- Improved consistency of how templates treat 'long_description' in setup.py
+  [Cris Ewing]
+
+- Fixed documentation references to the zopeskel script (we will call the script
+  'templer' when used from the templer packages.)
+  [Cris Ewing]
+
+1.0b1 December 1, 2010
+----------------------
 
 - Added structure system for better isolation of shared structural elements and
   improved maintainability
@@ -10,6 +20,12 @@ Changelog
 
 - Namespace for package changed to 'templer' to promote use by systems outside 
   the Zope world
+  [Cris Ewing]
+
+- Ported basic_namespace, nested_namespace and recipe templates over from 
+  zopeskel package to create core of new templer system (see
+  http://svn.plone.org/svn/collective/ZopeSkel/trunk/SPLITTING-PROPOSAL.txt for
+  the rationale behind this move)
   [Cris Ewing]
 
 - Package created by ZopeSkel
