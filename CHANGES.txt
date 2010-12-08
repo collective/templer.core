@@ -4,6 +4,10 @@ Changelog
 1.0b-dev (unreleased)
 ---------------------
 
+- Fixed bug in structure system that broke template rendering when a template 
+  had no license 
+  [Cris Ewing]
+
 - Moved zc.buildout template recipe into new package templer.buildout
   [Cris Ewing]
 
