@@ -196,7 +196,9 @@ For more information: paster help COMMAND""" % print_commands
         for structure in self.required_structures:
             my_structures.append(self.load_structure(structure))
         # append the chosen license structure, if applicable
-        my_structures.append(self.get_license(vars))
+        license_structure = self.get_license(vars)
+        if license_structure:
+            my_structures.append(license_structure)
         return my_structures
 
     def write_structures(self, command, output_dir, vars):
