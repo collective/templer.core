@@ -60,7 +60,6 @@ setup(name='templer.core',
         nested_namespace = templer.core:NestedNamespace
         
         [templer.templer_structure]
-        bootstrap = templer.core.structures:BootstrapStructure
         egg_docs = templer.core.structures:EggDocsStructure
         asl = templer.core.structures:ASLStructure
         bsd = templer.core.structures:BSDStructure
