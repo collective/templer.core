@@ -54,7 +54,6 @@ class TestLicenses(unittest.TestCase):
         """
         selectable_licenses = [k.lower() for k in LICENSE_CATEGORIES.keys()]
         all_structures = [ep.name for ep in self.template.all_structure_entry_points()]
-        
         for license in selectable_licenses:
             self.failUnless(license in all_structures)
     
