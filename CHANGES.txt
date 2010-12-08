@@ -4,6 +4,9 @@ Changelog
 1.0b-dev (unreleased)
 ---------------------
 
+1.0b2 December 8, 2010
+----------------------
+
 - Fixed bug in structure system that broke template rendering when a template 
   had no license 
   [Cris Ewing]
