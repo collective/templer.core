@@ -30,8 +30,9 @@ the license that was actually created::
 
 Let's look at the generated LICENSE.txt file to make sure that our author name
 and the correct package name and date were written in::
+
     >>> cat(license_dir, 'LICENSE.txt')
-    plone.app.example Copyright 2010, <YOUR NAME HERE>
+    plone.app.example Copyright ..., <YOUR NAME HERE>
     <BLANKLINE>
     ...
 
