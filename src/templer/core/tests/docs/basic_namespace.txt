@@ -16,9 +16,15 @@ Check the top-level package structure::
     CONTRIBUTORS.txt
     README.txt
     docs
+    setup.py
+    src
+
+Check the src directory structure::
+
+    >>> src_dir = os.path.join('plone.example', 'src')
+    >>> ls(src_dir)
     plone
     plone.example.egg-info
-    setup.py
 
 The default license for our this template is the GPL, make sure that the GPL is 
 the license that was actually created::
@@ -39,7 +45,7 @@ and the correct package name and date were written in::
 
 Let's check the content::
 
-    >>> package_dir = os.path.join('plone.example', 
+    >>> package_dir = os.path.join('plone.example', 'src',
     ...                            'plone', 'example')
     >>> ls(package_dir)
     __init__.py
