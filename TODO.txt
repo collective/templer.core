@@ -1,0 +1,3 @@
+* convert licence structures to structural vars so we can insert them at
+  check_vars time instead of waiting until template run time (see profile var
+  in templer.plone)

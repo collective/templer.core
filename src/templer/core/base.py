@@ -349,14 +349,13 @@ For more information: paster help COMMAND""" % print_commands
                     var.default = config.get('DEFAULT', var.name)
 
         self.override_package_names_defaults(vars, expect_vars)
-
         unused_vars = vars.copy()
 
         for var in expect_vars:
+            response = self.null_value_marker
             if var.name not in unused_vars:
                 if cmd.interactive:
                     prompt = var.pretty_description()
-                    response = self.null_value_marker
                     while response is self.null_value_marker:
                         response = cmd.challenge(prompt, var.default, var.should_echo)
                         if response == '?':
@@ -371,15 +370,26 @@ For more information: paster help COMMAND""" % print_commands
                             except ValidationException, e:
                                 print e
                                 response = self.null_value_marker;
-                    converted_vars[var.name] = response
                 elif var.default is command.NoDefault:
                     errors.append('Required variable missing: %s'
                                   % var.full_description())
                 else:
-                    converted_vars[var.name] = var.default
+                    response = var.default
             else:
-                converted_vars[var.name] = unused_vars.pop(var.name)
+                response = unused_vars.pop(var.name)
 
+            converted_vars[var.name] = response
+            # if a variable has structures associated, we will insert them
+            # in the template required_structures property at this time, let's
+            # test first to see if we need to do anything.
+            if var._is_structural:
+                structures = var.structures[str(response)]
+                if not isinstance(structures, (list, tuple, )):
+                    structures = [structures, ]
+                for structure in structures:
+                    if structure:
+                        self.required_structures.append(structure)
+            
             # filter the vars for mode.
             if var.name == 'expert_mode':
                 expert_mode = converted_vars['expert_mode']

@@ -21,6 +21,7 @@ class ValidationException(ValueError):
 class var(base_var):
 
     _default_widget = 'string'
+    _is_structural = False
 
     def __init__(self, name, description,
                  default='', should_echo=True,
@@ -76,6 +77,18 @@ class BooleanVar(var):
             raise ValidationException("Not a valid boolean value: %s" % value)
 
         return value
+
+
+class StructuralBooleanVar(BooleanVar):
+    
+    _is_structural = True
+    
+    def __init__(self, *args, **kwargs):
+        if 'structures' not in kwargs:
+            raise ValueError('StructuralBooleanVar requires a structure name')
+        self.structures = kwargs['structures']
+        del kwargs['structures']
+        super(StructuralBooleanVar, self).__init__(*args, **kwargs)
 
 
 class StringVar(var):
