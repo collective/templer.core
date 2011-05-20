@@ -13,6 +13,10 @@ long_description = (
     open('CHANGES.txt').read()
     + '\n')
 
+tests_require=[
+    'Cheetah', 
+    'PasteScript'],
+
 setup(name='templer.core',
       version=version,
       description="Core functionality for the templer tool",
@@ -48,12 +52,10 @@ setup(name='templer.core',
           'setuptools',
           "PasteScript>=1.7.2",
           "Cheetah>1.0,<=2.2.1",
-      ],    
-      tests_require=[
-        'zc.buildout==1.4.3',
-        'Cheetah', 
-        'PasteScript'],
+      ],
+      tests_require=tests_require,
       test_suite='templer.core.tests.test_all.test_suite',
+      extras_require=dict(test=tests_require),
       entry_points="""
         [paste.paster_create_template]
         basic_namespace = templer.core:BasicNamespace
