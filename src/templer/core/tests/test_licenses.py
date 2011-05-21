@@ -10,18 +10,18 @@ from templer.core.base import BaseTemplate
 from templer.core.base import LICENSE_CATEGORIES
 
 LICENSE_EXPECTATIONS = {
-    'ASL': ['NOTICE.txt', 'LICENSE.ASL'],
-    'BSD': ['LICENSE.txt',],
-    'EFL': ['LICENSE.txt', 'LICENSE.EFL'],
-    'FDL': ['LICENSE.txt', 'LICENSE.GFDL'],
-    'GPL': ['LICENSE.txt', 'LICENSE.GPL'],
-    'GPL3': ['LICENSE.txt', 'LICENSE.GPL'],
-    'LGPL': ['LICENSE.txt', 'LICENSE.GPL', 'LICENSE.LGPL'],
-    'MIT': ['LICENSE.txt',],
-    'MPL': ['LICENSE.txt', 'LICENSE.MPL'],
-    'MPL11': ['LICENSE.txt', 'LICENSE.MPL'],
-    'NPL': ['LICENSE.txt', 'LICENSE.NPL'],
-    'ZPL': ['LICENSE.txt', 'LICENSE.ZPL'],
+    'asl': ['NOTICE.txt', 'LICENSE.ASL'],
+    'bsd': ['LICENSE.txt',],
+    'efl': ['LICENSE.txt', 'LICENSE.EFL'],
+    'fdl': ['LICENSE.txt', 'LICENSE.GFDL'],
+    'gpl': ['LICENSE.txt', 'LICENSE.GPL'],
+    'gpl3': ['LICENSE.txt', 'LICENSE.GPL'],
+    'lgpl': ['LICENSE.txt', 'LICENSE.GPL', 'LICENSE.LGPL'],
+    'mit': ['LICENSE.txt',],
+    'mpl': ['LICENSE.txt', 'LICENSE.MPL'],
+    'mpl11': ['LICENSE.txt', 'LICENSE.MPL'],
+    'npl': ['LICENSE.txt', 'LICENSE.NPL'],
+    'zpl': ['LICENSE.txt', 'LICENSE.ZPL'],
 }
 
 class TestLicenses(unittest.TestCase):
@@ -66,7 +66,7 @@ class TestLicenses(unittest.TestCase):
             try:
                 # base template requires no structures, we should only get
                 # license structure
-                my_license = self.template.get_structures(self.license_vars)[0]
+                my_license = self.template.load_structure(self.license_vars['license_name'])
             except IndexError:
                 self.fail('unable to find %s license structure' % this_license)
         
