@@ -5,8 +5,9 @@ import unittest
 import doctest
 import sys
 import os
+import string
+import random
 import shutil
-import popen2
 import subprocess
 import tempfile
 
@@ -39,11 +40,14 @@ def paster(cmd):
     runner.run(args[1:])
 
 def read_sh(cmd):
-    _cmd = cmd
-    # old = sys.stdout 
-    child_stdout_and_stderr, child_stdin = popen2.popen4(_cmd)
-    child_stdin.close()
-    return child_stdout_and_stderr.read()
+    _cmd_list = cmd.strip().split(" ")
+    proc = subprocess.Popen(_cmd_list, 
+                            stdout=subprocess.PIPE, 
+                            stderr=subprocess.STDOUT)
+    proc.wait()
+    results = proc.stdout.read()
+    proc.stdout.close()
+    return results
 
 def exit_code_sh(cmd):
     _cmd_list = cmd.strip().split(" ")
