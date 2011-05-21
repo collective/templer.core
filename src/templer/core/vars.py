@@ -25,7 +25,7 @@ class var(base_var):
 
     def __init__(self, name, description,
                  default='', should_echo=True,
-                 title=None, help=None, widget=None,
+                 title=None, help=None, widget=None, structures=None,
                  modes=(EASY, EXPERT), page='Main'):
         self.name = name
         self.description = description
@@ -39,6 +39,12 @@ class var(base_var):
             self.widget = widget
         self.modes = modes
         self.page = page
+        if structures:
+            if not isinstance(structures, dict):
+                # TODO: make a better error message, perhaps pointing at
+                # documentation
+                raise ValueError('structures must be a dictionary')
+            self.structures = structures
 
     def pretty_description(self):
         title = getattr(self, 'title', self.name) or self.name
@@ -57,6 +63,12 @@ class var(base_var):
 
     def validate(self, value):
         raise NotImplementedError
+    
+    @property
+    def _is_structural(self):
+        if hasattr(self, 'structures'):
+            return isinstance(self.structures, dict)
+        return False
 
 
 class BooleanVar(var):
@@ -77,18 +89,6 @@ class BooleanVar(var):
             raise ValidationException("Not a valid boolean value: %s" % value)
 
         return value
-
-
-class StructuralBooleanVar(BooleanVar):
-    
-    _is_structural = True
-    
-    def __init__(self, *args, **kwargs):
-        if 'structures' not in kwargs:
-            raise ValueError('StructuralBooleanVar requires a structure name')
-        self.structures = kwargs['structures']
-        del kwargs['structures']
-        super(StructuralBooleanVar, self).__init__(*args, **kwargs)
 
 
 class StringVar(var):
@@ -121,6 +121,7 @@ class StringChoiceVar(var):
             raise ValidationException("Not a valid value: %s" % value)
 
         return value
+
 
 class TextVar(StringVar):
     """Multi-line values."""

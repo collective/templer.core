@@ -10,6 +10,8 @@ from templer.core.vars import TextVar
 from templer.core.vars import EASY
 from templer.core.vars import EXPERT
 
+lower_licenses = map(lambda x: x.lower(), LICENSE_CATEGORIES.keys())
+LICENSE_DICT = dict(zip(lower_licenses, lower_licenses))
 
 
 class BasicNamespace(BaseTemplate):
@@ -164,6 +166,7 @@ It will be used in the egg's setup.py.
             modes=(),
             page='Metadata',
             choices=LICENSE_CATEGORIES.keys(),
+            structures=LICENSE_DICT,
             help="""
 The license that this project is issued under. It will be used in the
 egg's setup.py.
