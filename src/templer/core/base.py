@@ -299,6 +299,14 @@ For more information: paster help COMMAND""" % print_commands
             package_name = parts[-1]
             get_var(expect_vars, 'package').default = package_name
 
+    def _set_structure_from_var(self, var, key):
+        structures = var.structures[key]
+        if not isinstance(structures, (list, tuple, )):
+            structures = [structures, ]
+        for structure in structures:
+            if structure:
+                self.required_structures.append(structure)
+
     def check_vars(self, vars, cmd):
         # if we need to notify users of anything before they start this
         # whole process, we can do it here.
@@ -380,12 +388,7 @@ For more information: paster help COMMAND""" % print_commands
             # in the template required_structures property at this time, let's
             # test first to see if we need to do anything.
             if var._is_structural:
-                structures = var.structures[str(response)]
-                if not isinstance(structures, (list, tuple, )):
-                    structures = [structures, ]
-                for structure in structures:
-                    if structure:
-                        self.required_structures.append(structure)
+                self._set_structure_from_var(var, str(response))
             
             # filter the vars for mode.
             if var.name == 'expert_mode':
