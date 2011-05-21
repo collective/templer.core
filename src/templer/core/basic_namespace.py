@@ -22,7 +22,7 @@ This creates a Python project without any Zope or Plone features.
     category = "Core Python"
 
     required_templates = []
-    required_structures = ['egg_docs',]
+    default_required_structures = ['egg_docs',]
     use_cheetah = True
     vars = copy.deepcopy(BaseTemplate.vars)
     vars += [
