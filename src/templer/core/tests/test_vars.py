@@ -17,6 +17,8 @@ class test_var(unittest.TestCase):
     """
     def setUp(self):
         self.var = var('name', 'description')
+        self.svar = var('name', 'description',
+                        structures={'False': 'foo', 'True': 'bar'})
     
     def testValidation(self):
         """ the validation method should raise a ValidationException
@@ -47,6 +49,16 @@ class test_var(unittest.TestCase):
         self.var.help = "I'm a little help text, short and stout"
         self.assertEqual(self.var.further_help(), 
                          "I'm a little help text, short and stout")
+
+    def testIsStructural(self):
+        self.assertTrue(self.svar._is_structural,
+                        'svar is not structural, but should be')
+        self.assertFalse(self.var._is_structural,
+                         'var is structural, but should not be')
+
+    def testBadStructureRaisesValueError(self):
+        self.assertRaises(ValueError, var, 
+                          'name', 'description', structures=['foo','bar'])
 
 
 class test_BooleanVar(unittest.TestCase):

@@ -43,6 +43,8 @@ class var(base_var):
             if not isinstance(structures, dict):
                 # TODO: make a better error message, perhaps pointing at
                 # documentation
+                # TODO: would it be possible to validate all dictionary keys
+                # and ensure that all possible values in dict have a good key
                 raise ValueError('structures must be a dictionary')
             self.structures = structures
 
