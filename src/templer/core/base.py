@@ -1,5 +1,6 @@
 import os
 import pkg_resources
+from copy import copy
 
 from textwrap import TextWrapper
 import ConfigParser
@@ -18,8 +19,8 @@ LICENSE_CATEGORIES = {
     'BSD' : 'License :: OSI Approved :: BSD License',
     'EFL' : 'License :: Eiffel Forum License (EFL)',
     'FDL' : 'License :: OSI Approved :: GNU Free Documentation License (FDL)',
-    'GPL' : 'License :: OSI Approved :: GNU General Public License (GPL)',
-    'GPL3' : 'License :: OSI Approved :: GNU General Public License (GPL)',
+    'GPL' : 'License :: OSI Approved :: GNU General Public License (GPL) v2',
+    'GPL3' : 'License :: OSI Approved :: GNU General Public License (GPL) v3',
     'LGPL' : 'License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)',
     'MIT' : 'License :: OSI Approved :: MIT License',
     'MPL' : 'License :: OSI Approved :: Mozilla Public License 1.0 (MPL)',
@@ -80,7 +81,11 @@ class BaseTemplate(templates.Template):
     null_value_marker = []
     pre_run_msg = None
     post_run_msg = None
-    required_structures = []
+    default_required_structures = []
+    
+    def __init__(self, name):
+        super(BaseTemplate, self).__init__(name)
+        self.required_structures = copy(self.default_required_structures)
 
     vars = [
         StringChoiceVar(
@@ -186,19 +191,11 @@ For more information: paster help COMMAND""" % print_commands
                 return ep.load()
         raise LookupError('No entry point for structure %s available' % name)
     
-    def get_license(self, vars):
-        if 'license_name' in vars.keys():
-            my_license = vars['license_name'].lower()
-            return self.load_structure(my_license)
-    
     def get_structures(self, vars):
         my_structures = []
+        # TODO: protect users against errors raised by load_structure
         for structure in self.required_structures:
             my_structures.append(self.load_structure(structure))
-        # append the chosen license structure, if applicable
-        license_structure = self.get_license(vars)
-        if license_structure:
-            my_structures.append(license_structure)
         return my_structures
 
     def write_structures(self, command, output_dir, vars):
@@ -374,9 +371,9 @@ For more information: paster help COMMAND""" % print_commands
                     errors.append('Required variable missing: %s'
                                   % var.full_description())
                 else:
-                    response = var.default
+                    response = var.validate(var.default)
             else:
-                response = unused_vars.pop(var.name)
+                response = var.validate(unused_vars.pop(var.name))
 
             converted_vars[var.name] = response
             # if a variable has structures associated, we will insert them
