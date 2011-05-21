@@ -7,6 +7,7 @@ import sys
 import os
 import shutil
 import popen2
+import subprocess
 import tempfile
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
@@ -43,6 +44,14 @@ def read_sh(cmd):
     child_stdout_and_stderr, child_stdin = popen2.popen4(_cmd)
     child_stdin.close()
     return child_stdout_and_stderr.read()
+
+def exit_code_sh(cmd):
+    _cmd_list = cmd.strip().split(" ")
+    proc = subprocess.Popen(_cmd_list, 
+                            stdout=subprocess.PIPE, 
+                            stderr=subprocess.PIPE)
+    proc.wait()
+    return proc.returncode
 
 def ls(*args):
     dirname = os.path.join(*args)
