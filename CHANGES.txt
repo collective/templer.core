@@ -34,8 +34,8 @@ Changelog
 
 - Ported basic_namespace, nested_namespace and recipe templates over from 
   zopeskel package to create core of new templer system (see
-  http://svn.plone.org/svn/collective/ZopeSkel/trunk/SPLITTING-PROPOSAL.txt for
-  the rationale behind this move)
+  http://svn.plone.org/svn/collective/ZopeSkel/branches/2.x-maintenance/SPLITTING-PROPOSAL.txt
+  for the rationale behind this move)
   [Cris Ewing]
 
 - Package created by ZopeSkel

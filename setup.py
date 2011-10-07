@@ -1,4 +1,11 @@
+import sys
 from setuptools import setup, find_packages
+
+# # PasteDeploy 1.5.0 is explicitly not python 2.4 compatible, if we are using
+# python 2.4, pin PasteDeploy to an earlier version
+paste_deploy = "PasteDeploy"
+if sys.version_info[1] < 5:
+    paste_deploy += "<1.5.0"
 
 version = '1.0b-dev'
 
@@ -14,7 +21,7 @@ long_description = (
     + '\n')
 
 tests_require=[
-    'Cheetah', 
+    'Cheetah',
     'PasteScript'],
 
 setup(name='templer.core',
@@ -50,6 +57,7 @@ setup(name='templer.core',
       zip_safe=False,
       install_requires=[
           'setuptools',
+          paste_deploy,
           "PasteScript>=1.7.2",
           "Cheetah>1.0,<=2.2.1",
       ],
@@ -59,7 +67,7 @@ setup(name='templer.core',
         [paste.paster_create_template]
         basic_namespace = templer.core:BasicNamespace
         nested_namespace = templer.core:NestedNamespace
-        
+
         [templer.templer_structure]
         egg_docs = templer.core.structures:EggDocsStructure
         asl = templer.core.structures:ASLStructure
