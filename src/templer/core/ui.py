@@ -33,7 +33,8 @@ def list_sorted_templates(filter_group=False):
         t_e_ps = pkg_resources.get_entry_map(
             'zopeskel')['paste.paster_create_template'].values()
     else:
-        t_e_ps = pkg_resources.iter_entry_points('paste.paster_create_template')
+        t_e_ps = pkg_resources.iter_entry_points(
+            'paste.paster_create_template')
     templates = []
     for entry in t_e_ps:
         try:
@@ -41,13 +42,13 @@ def list_sorted_templates(filter_group=False):
             template = entry.load()
             if issubclass(template, BaseTemplate):
                 templates.append(
-                        { 'name': entry.name,
-                          'summary': template.summary,
-                          'class': template,
-                          'category': getattr(template, 'category', 'Uncategorized'),
-                          'help': getattr(template, 'help', "").strip(),
-                          'entry':entry,
-                        } )
+                        {'name': entry.name,
+                         'summary': template.summary,
+                         'class': template,
+                         'category': getattr(template, 'category',
+                                             'Uncategorized'),
+                         'help': getattr(template, 'help', "").strip(),
+                         'entry': entry})
         except Exception, e:
             # We will not be stopped!
             print 'Warning: could not load entry point %s (%s: %s)' % (

@@ -4,11 +4,15 @@ import unittest
 import sys
 import StringIO
 
-from templer.core.zopeskel_script import checkdots, process_args, run, DESCRIPTION
+from templer.core.zopeskel_script import checkdots
+from templer.core.zopeskel_script import process_args
+from templer.core.zopeskel_script import run
+from templer.core.zopeskel_script import DESCRIPTION
 from templer.core.ui import list_sorted_templates
 
 
 def capture_stdout(function):
+
     def _capture_stdout(*args, **kw):
         newout = StringIO.StringIO()
         oldout = sys.stdout
@@ -20,8 +24,9 @@ def capture_stdout(function):
             newout.seek(0)
             return newout.read()
     return _capture_stdout
-    
+
 run = capture_stdout(run)
+
 
 class test_zopeskel(unittest.TestCase):
     """Tests for ZopeSkel script.
@@ -30,7 +35,8 @@ class test_zopeskel(unittest.TestCase):
     def test_checkdots_none(self):
         """Verify that checkdots works with templates without ndots hint."""
 
-        class FauxTemplate: pass
+        class FauxTemplate:
+            pass
         t = FauxTemplate()
 
         checkdots(t, "anything is legal; not a package")
@@ -38,7 +44,8 @@ class test_zopeskel(unittest.TestCase):
     def test_checkdots_two(self):
         """Verify that checkdots validates templates with ndots hint."""
 
-        class FauxTemplate: pass
+        class FauxTemplate:
+            pass
         t = FauxTemplate()
 
         t.ndots = 2
@@ -49,26 +56,26 @@ class test_zopeskel(unittest.TestCase):
         self.assertRaises(ValueError, checkdots, t, "two.dots.but not legal")
 
         checkdots(t, "two.dots.legal")
-        
+
     def test_process_args(self):
-        """Ensure that process_args correctly processes command-line arguments"""
+        """Ensure process_args correctly processes command-line arguments"""
         oldargv = sys.argv
-        
+
         sys.argv = ['zopskel']
         self.assertRaises(SyntaxError, process_args)
-        
+
         sys.argv.append('archetype')
         processed = process_args()
         self.failUnlessEqual(processed[0], 'archetype')
         self.failIf(processed[1])
         self.failIf(processed[2])
-        
+
         sys.argv.append('my.project')
         processed = process_args()
         self.failUnlessEqual(processed[0], 'archetype')
         self.failUnlessEqual(processed[1], 'my.project')
         self.failIf(processed[2])
-        
+
         sys.argv.append('--bob=kate')
         processed = process_args()
         self.failUnlessEqual(processed[0], 'archetype')
@@ -81,49 +88,50 @@ class test_zopeskel(unittest.TestCase):
         self.failUnlessEqual(processed[0], 'archetype')
         self.failIf(processed[1])
         self.failUnlessEqual(processed[2]['--bob'], 'kate')
-        
+
         # providing arguments in '-name val' form is _not_ allowed
         sys.argv = ['zopeskel', 'archetype', 'my.project', '-bob', 'kate']
         self.assertRaises(SyntaxError, process_args)
-        
+
         # the --svn-repository argument is _not_ allowed in any form
-        sys.argv = sys.argv[:3] + ['--svn-repository=svn://svn.junk.org/svn/blah']
+        sys.argv = sys.argv[:3] + ['--svn-repository=svn://svn.junk.org/svn']
         self.assertRaises(SyntaxError, process_args)
-        
+
         sys.argv[3] = 'svn-repository=svn://svn.junk.org/svn/blah'
         self.assertRaises(SyntaxError, process_args)
-        
+
         # providing args in a '-name val' format is not supported
         sys.argv = sys.argv[:3] + ['bob', 'kate']
         self.assertRaises(SyntaxError, process_args)
-        
+
         sys.argv = oldargv
 
     def test_script_errors(self):
         """Verify that the run method catches errors correctly"""
         oldargv = sys.argv
-        
+
         # non-existent templates are not caught until in 'run'
         sys.argv = ['zopeskel', 'no-template', 'my.package']
         output = run()
         self.failUnless('ERROR: No such template' in output)
-        
+
         # calling the script with no arguments at all prints usage
         sys.argv = sys.argv[:1]
         output = run()
         self.failUnless('Usage:' in output)
-        
+
         sys.argv = oldargv
 
     def test_script_features(self):
         """Verify that the help features of the script function correctly"""
         oldargv = sys.argv
-        
-        # --help produces the DESCRIPTION string 
+
+        # --help produces the DESCRIPTION string
         sys.argv = ['zopeskel', '--help']
         output = run()
-        self.failUnless(DESCRIPTION in output, '--help produces incorrect output: %s' % output)        
-        
+        self.failUnless(DESCRIPTION in output,
+                        '--help produces incorrect output: %s' % output)
+
         # --list produces a verbose list of all templates by category
         sys.argv = ['zopeskel', '--list']
         output = run()
@@ -137,24 +145,25 @@ class test_zopeskel(unittest.TestCase):
         for tname in tempnames:
             self.failUnless(tname in output, '%s not in --list output' % tname)
         for summary in tempsums:
-            self.failUnless(summary in output, '%s not in --list output' % summary)
-        
-        # --make-config-file produces a config file with headings for each template
+            self.failUnless(summary in output,
+                            '%s not in --list output' % summary)
+
+        # --make-config-file produces a config file with headings for each
+        # template
         sys.argv = ['zopeskel', '--make-config-file']
         output = run()
         for theading in ['[' + name + ']' for name in tempnames]:
-            self.failUnless(theading in output, '%s does not appear in .zopeskel' % theading)
-        
-        # --version should output a version number.  make sure it finds something
+            self.failUnless(theading in output,
+                            '%s does not appear in .zopeskel' % theading)
+
+        # --version should output a version number.  make sure it finds
+        # something
         sys.argv = ['zopeskel', '--version']
         output = run()
         self.failIf('unable' in output)
-        
+
         sys.argv = oldargv
-        
-        
-        
-        
+
 
 def test_suite():
     suite = unittest.TestSuite([

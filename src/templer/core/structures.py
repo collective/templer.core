@@ -3,14 +3,15 @@ import os
 
 from paste.script import copydir
 
+
 class Structure(object):
-    
+
     # Subclasses must define:
     # _structure_dir (or structure_dir())
     use_cheetah = True
     template_renderer = None
     _structure_dir = None
-    
+
     def module_dir(self):
         """Returns the module directory of this template."""
         mod = sys.modules[self.__class__.__module__]
@@ -19,11 +20,11 @@ class Structure(object):
     def structure_dir(self):
         assert self._structure_dir is not None, (
             "Structure %r didn't set _structure_dir" % self)
-        if isinstance( self._structure_dir, tuple):
+        if isinstance(self._structure_dir, tuple):
             return self._structure_dir
         else:
-            return [os.path.join(self.module_dir(), self._structure_dir),]
-    
+            return [os.path.join(self.module_dir(), self._structure_dir), ]
+
     def write_files(self, command, output_dir, vars):
         structure_dirs = self.structure_dir()
         if len(structure_dirs) > 0:
@@ -93,4 +94,3 @@ class NPLStructure(Structure):
 
 class ZPLStructure(Structure):
     _structure_dir = 'structures/licenses/zpl'
-

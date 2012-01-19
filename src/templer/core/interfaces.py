@@ -3,11 +3,11 @@ class IVar:
     """
 
     # actual variable name, eg "description"
-    name = ""    
+    name = ""
 
     # human-facing variable name, eg "Product Description"
-    title = ""     
-    
+    title = ""
+
     # Short, 1-sentence description
     # e.g., "Short description of this product."
     description = ""
@@ -24,13 +24,15 @@ class IVar:
     # Should Echo   # wtf? is this used?
     should_echo = True
 
+    widget = ""
+
     # Modes that question should appear in
     # 'easy', 'intermediate', 'advanced'
     modes = ()
 
-    # Widget hint?
-    # XXX Todo
-    # strawman: ('text','multitext','tf','int')
+    page = ""
+
+    structures
 
     def full_description():
         """Returns variable name and description."""
@@ -48,8 +50,3 @@ class IVar:
         normalized version of it (eg, "yes" -> True, for boolean
         questions).
         """
-
-
-
-
-

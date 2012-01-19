@@ -24,7 +24,7 @@ This creates a Python project without any Zope or Plone features.
     category = "Core Python"
 
     required_templates = []
-    default_required_structures = ['egg_docs',]
+    default_required_structures = ['egg_docs', ]
     use_cheetah = True
     vars = copy.deepcopy(BaseTemplate.vars)
     vars += [
@@ -172,7 +172,7 @@ The license that this project is issued under. It will be used in the
 egg's setup.py.
 
 Common choices here are 'GPL' (for the GNU General Public License),
-'ZPL' (for the Zope Public License', and 'BSD' (for the BSD license).
+'ZPL' (for the Zope Public License', or 'BSD' (for the BSD license).
 
 %s
 

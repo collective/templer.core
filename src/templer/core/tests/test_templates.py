@@ -5,18 +5,18 @@ import unittest
 import doctest
 import sys
 import os
-import string
-import random
 import shutil
 import subprocess
 import tempfile
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
+
 def rmdir(*args):
     dirname = os.path.join(*args)
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
+
 
 def paster(cmd):
     print "paster %s" % cmd
@@ -39,23 +39,26 @@ def paster(cmd):
     runner = command(command_name)
     runner.run(args[1:])
 
+
 def read_sh(cmd):
     _cmd_list = cmd.strip().split(" ")
-    proc = subprocess.Popen(_cmd_list, 
-                            stdout=subprocess.PIPE, 
+    proc = subprocess.Popen(_cmd_list,
+                            stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT)
     proc.wait()
     results = proc.stdout.read()
     proc.stdout.close()
     return results
 
+
 def exit_code_sh(cmd):
     _cmd_list = cmd.strip().split(" ")
-    proc = subprocess.Popen(_cmd_list, 
-                            stdout=subprocess.PIPE, 
+    proc = subprocess.Popen(_cmd_list,
+                            stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE)
     proc.wait()
     return proc.returncode
+
 
 def ls(*args):
     dirname = os.path.join(*args)
@@ -71,12 +74,15 @@ def ls(*args):
     else:
         print 'No directory named %s' % dirname
 
+
 def cd(*args):
     dirname = os.path.join(*args)
     os.chdir(dirname)
 
+
 def config(filename):
     return os.path.join(current_dir, filename)
+
 
 def cat(*args):
     filename = os.path.join(*args)
@@ -85,13 +91,16 @@ def cat(*args):
     else:
         print 'No file named %s' % filename
 
+
 def touch(*args, **kwargs):
     filename = os.path.join(*args)
-    open(filename, 'w').write(kwargs.get('data',''))
+    open(filename, 'w').write(kwargs.get('data', ''))
+
 
 def testSetUp(test):
     test.temp_dir = tempfile.mkdtemp()
     cd(test.temp_dir)
+
 
 def testTearDown(test):
     shutil.rmtree(test.temp_dir, ignore_errors=True)
@@ -109,6 +118,7 @@ def testTearDown(test):
 
     sys.path = ws.entries[:]
 
+
 def doc_suite(test_dir, setUp=testSetUp, tearDown=testTearDown, globs=None):
     """Returns a test suite, based on doctests found in /docs."""
     suite = []
@@ -125,12 +135,13 @@ def doc_suite(test_dir, setUp=testSetUp, tearDown=testTearDown, globs=None):
             os.listdir(doctest_dir) if doc.endswith('.txt')]
 
     for test in docs:
-        suite.append(doctest.DocFileSuite(test, optionflags=flags, 
-                                          globs=globs, setUp=setUp, 
+        suite.append(doctest.DocFileSuite(test, optionflags=flags,
+                                          globs=globs, setUp=setUp,
                                           tearDown=tearDown,
                                           module_relative=False))
 
     return unittest.TestSuite(suite)
+
 
 def test_suite():
     """returns the test suite"""
@@ -139,4 +150,3 @@ def test_suite():
 
 if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')
-

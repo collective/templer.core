@@ -15,9 +15,11 @@ from templer.core.vars import EASY
 from templer.core.basic_namespace import BasicNamespace
 from templer.core.nested_namespace import NestedNamespace
 
+
 class test_base_template(unittest.TestCase):
     """ test for methods on the base template class
     """
+
     def setUp(self):
         """ set up some basics for the coming tests
         """
@@ -35,8 +37,7 @@ class test_base_template(unittest.TestCase):
                     title="Text Title", default="text",
                     modes=()),
             DottedVar('dot_var', 'This is a dotted variable',
-                      title="Dotted Title", default="dotted.variable")
-        ]
+                      title="Dotted Title", default="dotted.variable")]
         self.template = BaseTemplate('my_name')
         create = get_commands()['create'].load()
         command = create('create')
@@ -81,8 +82,9 @@ class test_base_template(unittest.TestCase):
         self.assertEqual(var.default, 'foo')
 
     def test_pages(self):
-        """ pagaes divide questions for a template into discreet sets for web GUI
+        """ pagaes provide discreet sets of template questions for web GUI
         """
+
         class MyTemplate(BaseTemplate):
             vars = BaseTemplate.vars + self.vars
 
@@ -119,37 +121,40 @@ class test_base_template(unittest.TestCase):
         """ verify that the position of a template can be reliably found
         """
         stack = self.template.get_template_stack(self.command)
-        self.assertRaises(ValueError, self.template.get_position_in_stack, stack)
-        
+        self.assertRaises(
+            ValueError, self.template.get_position_in_stack, stack)
+
         new_template = NestedNamespace('joe')
-        self.assertEqual(new_template.get_position_in_stack(stack), len(stack)-1)
-    
+        self.assertEqual(
+            new_template.get_position_in_stack(stack), len(stack) - 1)
+
     def test_get_template_stack(self):
         """ verify that running this command against a create command
             with the argument '-t nested_namespace' returns the expected vals
         """
         stack = self.template.get_template_stack(self.command)
         self.assertEqual(len(stack), 1)
-        
+
         self.failIf(self.template.__class__ in
                     [t.__class__ for t in stack], "%s" % stack)
         new_template = NestedNamespace('joe')
         self.failUnless(new_template.__class__ in
                         [t.__class__ for t in stack], "%s" % stack)
-    
+
+        errmsg = "%s does not appear to be a subclass of %s"
         for c in [t.__class__ for t in stack]:
             self.failUnless(isinstance(new_template, c),
-                            "%s does not appear to be a subclass of %s" % (new_template, c))
-    
+                            errmsg % (new_template, c))
+
     def test_should_print_subcommands(self):
-        """ If a template has subcommands, they should be printed after the template runs
+        """ Subcommands should be printed after the template runs
         """
         b_template = BasicNamespace('tom')
         n_template = NestedNamespace('bob')
-        # pretend the nested_namespace template provides localcommands (it 
+        # pretend the nested_namespace template provides localcommands (it
         # doesn't have to actually provide them, just claim that it does)
         n_template.use_local_commands = True
-        
+
         self.failIf(b_template.should_print_subcommands(self.command))
         self.failUnless(n_template.should_print_subcommands(self.command))
 

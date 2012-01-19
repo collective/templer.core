@@ -17,7 +17,7 @@ Usage:
     zopeskel --list                List template verbosely, with details
     zopeskel --make-config-file    Output .zopeskel prefs file
     zopeskel --version             Print installed version
-    
+
 %s
 Warning:  use of the --svn-repository argument is not allowed with this script
 
@@ -133,16 +133,16 @@ Notes:
 Differences from the 'paster create' command
 --------------------------------------------
 
-1) The --svn-repository argument that can be provided to 'paster create' is not
-   allowed when using the zopeskel script.  It will raise an error.  The reasons
-   for this are discussed at length in the zopeskel mailing list and in the 
-   zopeskel issue tracker:
+1) The --svn-repository argument that can be provided to 'paster create' is
+   not allowed when using the zopeskel script.  It will raise an error.  The
+   reasons for this are discussed at length in the zopeskel mailing list and
+   in the zopeskel issue tracker:
    http://plone.org/products/zopeskel/issues/34
    http://plone.org/products/zopeskel/issues/35
-   
-   If this argument is desired, the user should revert to calling 'paster create'
-   directly.  However, be warned that buildout templates will not work with the
-   argument due to assumptions in the base paster code.
+
+   If this argument is desired, the user should revert to calling 'paster
+   create' directly.  However, be warned that buildout templates will not work
+   with the argument due to assumptions in the base paster code.
 
 
 Questions
@@ -169,8 +169,8 @@ namespace', like 'foo.bar').
   2: """
 This template expects a project name with 2 dots in it (a 'nested
 namespace', like 'foo.bar.baz').
-"""
-}
+"""}
+
 
 def checkdots(template, name):
     """Check if project name appears legal, given template requirements.
@@ -180,9 +180,10 @@ def checkdots(template, name):
     provided project name is has correct number of namespaces and that
     each part is a legal Python identifier.
     """
-
+    msg = "Not a valid Python dotted name: %s ('%s' is not an identifier)"
     ndots = getattr(template, 'ndots', None)
-    if ndots is None: return   # No validation possible
+    if ndots is None:
+        return   # No validation possible
 
     cdots = name.count(".")
     if ndots != cdots:
@@ -190,32 +191,35 @@ def checkdots(template, name):
             "Project name expected %i dots, supplied '%s' has %i dots" % (
                 ndots, name, cdots))
     for part in name.split("."):
-        # Check if Python identifier, http://code.activestate.com/recipes/413487/
+        # Check if Python identifier,
+        # http://code.activestate.com/recipes/413487/
         try:
             class test(object): __slots__ = [part]
         except TypeError:
-            raise ValueError(
-                "Not a valid Python dotted name: %s ('%s' is not an identifier)" % (name, part))
-
+            raise ValueError(msg % (name, part))
 
 
 def usage():
     templates = list_printable_templates()
     print USAGE % templates
 
+
 def show_help():
     print DESCRIPTION
 
+
 def show_version():
+    # XXX: this always returns the version of templer core, even when
+    # called from zopeskel.  We should fix that.
     try:
         dist = pkg_resources.get_distribution('templer.core')
         print dist.version
     except pkg_resources.DistributionNotFound:
         print 'unable to identify zopeskel version'
 
+
 def list_verbose():
     """List templates verbosely, with full help."""
-
     textwrapper = TextWrapper(
             initial_indent="   ", subsequent_indent="   ")
     cats = list_sorted_templates()
@@ -239,7 +243,7 @@ def list_printable_templates():
 
     cats = list_sorted_templates()
     templates = sum(cats.values(), [])   # flatten into single list
-    max_name = max([len(x['name']) for x  in templates])
+    max_name = max([len(x['name']) for x in templates])
 
     for title, items in cats.items():
         print >>s, "\n%s\n" % title
@@ -271,7 +275,8 @@ def generate_dotzopeskel():
         for var in tempc.vars:
             if hasattr(var, 'pretty_description'):
                 print "# %s" % var.pretty_description()
-            print "# %s = %s\n" % ( var.name, var.default )
+            print "# %s = %s\n" % (var.name, var.default)
+
 
 def process_args():
     """ return a tuple of template_name, output_name and everything else
@@ -291,17 +296,19 @@ def process_args():
             output_name = arg
         elif eq_index > 0:
             key, val = arg.split('=')
-            # the --svn-repository argument to paster does some things that cause
-            # it to be pretty much incompatible with zopeskel. See the following
-            # zopeskel issues:
+            # the --svn-repository argument to paster does some things that
+            # cause it to be pretty much incompatible with zopeskel. See the
+            # following zopeskel issues:
             #     http://plone.org/products/zopeskel/issues/35
             #     http://plone.org/products/zopeskel/issues/34
-            # For this reason, we are going to disallow using the --svn-repository 
-            # argument when using the zopeskel wrapper.  Those who wish to use it
-            # can still do so by going back to paster, with the caveat that there
-            # are some templates (particularly the buildout ones) for which the
-            # argument will always throw errors (at least until the problems are
-            # fixed upstream in paster itself).
+            # For this reason, we are going to disallow using the
+            # --svn-repository argument when using the zopeskel wrapper.
+            #
+            # Those who wish to use it can still do so by going back to paster,
+            # with the caveat that there are some templates (particularly the
+            # buildout ones) for which the argument will always throw errors
+            # (at least until the problems are fixed upstream in paster
+            # itself).
             if 'svn-repository' in key:
                 msg = 'for a number of reasons, the --svn-repository argument '
                 msg += 'is not allowed with the zopeskel script. '
@@ -310,10 +317,9 @@ def process_args():
             others[key] = val
         else:
             raise SyntaxError(arg)
-    
-    
 
     return template_name, output_name, others
+
 
 def run():
     """ """
@@ -377,7 +383,8 @@ def run():
         help = DOT_HELP.get(ndots)
 
         while True:
-            if help: print help
+            if help:
+                print help
             try:
                 output_name = command.challenge("Enter project name")
                 checkdots(template, output_name)
@@ -392,9 +399,7 @@ If at any point, you need additional help for a question, you can enter
 '?' and press RETURN.
 """
 
-    optslist = [ '%s=%s' % (k,v) for k, v in opts.items() ]
+    optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
     if output_name is not None:
         optslist.insert(0, output_name)
-    command.run( [ '-q', '-t', template_name ] + optslist )
-
-
+    command.run(['-q', '-t', template_name] + optslist)
