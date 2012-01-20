@@ -389,7 +389,7 @@ def run():
                 challenge = "Enter project name (or q to quit)"
                 output_name = command.challenge(challenge)
                 if output_name == 'q':
-                    print "Exiting...\n"
+                    print "\n\nExiting...\n"
                     sys.exit(0)
                 checkdots(template, output_name)
             except ValueError, e:
@@ -409,8 +409,8 @@ If at any point, you need additional help for a question, you can enter
     try:
         command.run(['-q', '-t', template_name] + optslist)
     except KeyboardInterrupt:
-        print "Exiting...\n"
+        print "\n\nExiting...\n"
     except Exception, e:
-        print "ERROR: %s\n" % str(e)
+        print "\nERROR: %s\n" % str(e)
         sys.exit(1)
     sys.exit(0)
