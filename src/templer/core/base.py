@@ -117,18 +117,21 @@ $HOME/.zopeskel file.
     #for the generated project. the post method is not a candidate because
     #many templates override it
     def run(self, command, output_dir, vars):
-
+        # can we make the inclusion of this provisional, based on 
+        # whether the localcommands package is loaded?
         if self.use_local_commands and 'ZopeSkel' not in self.egg_plugins:
-            self.egg_plugins.append('ZopeSkel')
+            self.egg_plugins.append('templer.localcommands')
 
         templates.Template.run(self, command, output_dir, vars)
 
+        # can we make the inclusion of this provisional, based on 
+        # whether the localcommands package is loaded?
         setup_cfg = os.path.join(output_dir, 'setup.cfg')
         if self.use_local_commands:
-            update_setup_cfg(setup_cfg, 'zopeskel', 'template', self.name)
+            update_setup_cfg(setup_cfg, 'templer.local', 'template', self.name)
 
     def print_subtemplate_notice(self, output_dir=None):
-            """Print a notice about local commands being availabe (if this is
+            """Print a notice about local commands being available (if this is
             indeed the case).
 
             Unfortunately for us, at this stage in the process, the
@@ -136,8 +139,15 @@ $HOME/.zopeskel file.
             within the scope of this template running [see
             paste.script.create_distro.py]), so we cannot show which
             subtemplates are available.
+            
+            ^^^ this appears not to be completely true.  The point where
+                this method is run we are in a template which has subcommands
+                and so I believe that it might actually be possible to print
+                a list of those subtemplates which belong to me, since 
+                self.name is the same as the template name used in 
+                command._list_sub_templates
             """
-            plugins = pluginlib.resolve_plugins(['ZopeSkel'])
+            plugins = pluginlib.resolve_plugins(['templer.localcommands'])
             commands = pluginlib.load_commands_from_plugins(plugins)
             if not commands:
                 return
