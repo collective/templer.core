@@ -326,30 +326,30 @@ def run():
 
     if "--help" in sys.argv:
         show_help()
-        return
+        sys.exit(0)
 
     if "--make-config-file" in sys.argv:
         generate_dotzopeskel()
-        return
+        sys.exit(0)
 
     if "--list" in sys.argv:
         list_verbose()
-        return
+        sys.exit(0)
 
     if "--version" in sys.argv:
         show_version()
-        return
+        sys.exit(0)
 
     if len(sys.argv) == 1:
         usage()
-        return
+        sys.exit(0)
 
     try:
         template_name, output_name, opts = process_args()
     except SyntaxError, e:
         usage()
-        print "ERROR: There was a problem with your arguments: %s\n" % e
-        return
+        print "ERROR: There was a problem with your arguments: %s\n" % str(e)
+        sys.exit(1)
 
     rez = pkg_resources.iter_entry_points(
             'paste.paster_create_template',
@@ -358,7 +358,7 @@ def run():
     if not rez:
         usage()
         print "ERROR: No such template: %s\n" % template_name
-        return
+        sys.exit(1)
 
     template = rez[0].load()
 
@@ -375,8 +375,8 @@ def run():
         try:
             checkdots(template, output_name)
         except ValueError, e:
-            print "ERROR: %s\n" % e
-            return
+            print "ERROR: %s\n" % str(e)
+            sys.exit(1)
 
     else:
         ndots = getattr(template, 'ndots', None)
@@ -386,7 +386,11 @@ def run():
             if help:
                 print help
             try:
-                output_name = command.challenge("Enter project name")
+                challenge = "Enter project name (or q to quit)"
+                output_name = command.challenge(challenge)
+                if output_name == 'q':
+                    print "Exiting...\n"
+                    sys.exit(0)
                 checkdots(template, output_name)
             except ValueError, e:
                 print "\nERROR: %s" % e
@@ -402,4 +406,11 @@ If at any point, you need additional help for a question, you can enter
     optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
     if output_name is not None:
         optslist.insert(0, output_name)
-    command.run(['-q', '-t', template_name] + optslist)
+    try:
+        command.run(['-q', '-t', template_name] + optslist)
+    except KeyboardInterrupt:
+        print "Exiting...\n"
+    except Exception, e:
+        print "ERROR: %s\n" % str(e)
+        sys.exit(1)
+    sys.exit(0)
