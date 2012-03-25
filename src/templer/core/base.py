@@ -117,9 +117,11 @@ $HOME/.zopeskel file.
     #for the generated project. the post method is not a candidate because
     #many templates override it
     def run(self, command, output_dir, vars):
-        # can we make the inclusion of this provisional, based on 
-        # whether the localcommands package is loaded?
-        if self.use_local_commands and 'ZopeSkel' not in self.egg_plugins:
+        # XXX: The goal here is to only do this if templer.localcommands has
+        #      been installed.  If it isn't the user doesn't want local
+        #      commands and we should not inject them (it would fail anyway)
+        if self.use_local_commands and\
+            'templer.localcommands' not in self.egg_plugins:
             self.egg_plugins.append('templer.localcommands')
 
         templates.Template.run(self, command, output_dir, vars)
