@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
 
 __docformat__ = 'restructuredtext'
 
-import unittest
+import unittest2 as unittest
+
 import doctest
 import sys
 import os

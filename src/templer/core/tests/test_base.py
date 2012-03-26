@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import unittest
+import unittest2 as unittest
 
 from paste.script.command import get_commands
 

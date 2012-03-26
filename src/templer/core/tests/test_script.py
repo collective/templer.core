@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import unittest
+import unittest2 as unittest
+
 import sys
 import StringIO
 
