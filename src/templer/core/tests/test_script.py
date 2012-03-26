@@ -67,28 +67,28 @@ class test_zopeskel(unittest.TestCase):
 
         sys.argv.append('archetype')
         processed = process_args()
-        self.failUnlessEqual(processed[0], 'archetype')
-        self.failIf(processed[1])
-        self.failIf(processed[2])
+        self.assertEqual(processed[0], 'archetype')
+        self.assertFalse(processed[1])
+        self.assertFalse(processed[2])
 
         sys.argv.append('my.project')
         processed = process_args()
-        self.failUnlessEqual(processed[0], 'archetype')
-        self.failUnlessEqual(processed[1], 'my.project')
-        self.failIf(processed[2])
+        self.assertEqual(processed[0], 'archetype')
+        self.assertEqual(processed[1], 'my.project')
+        self.assertFalse(processed[2])
 
         sys.argv.append('--bob=kate')
         processed = process_args()
-        self.failUnlessEqual(processed[0], 'archetype')
-        self.failUnlessEqual(processed[1], 'my.project')
-        self.failUnlessEqual(processed[2]['--bob'], 'kate')
+        self.assertEqual(processed[0], 'archetype')
+        self.assertEqual(processed[1], 'my.project')
+        self.assertEqual(processed[2]['--bob'], 'kate')
 
         # process_args will allow us to skip the project name argument
         sys.argv.pop(2)
         processed = process_args()
-        self.failUnlessEqual(processed[0], 'archetype')
-        self.failIf(processed[1])
-        self.failUnlessEqual(processed[2]['--bob'], 'kate')
+        self.assertEqual(processed[0], 'archetype')
+        self.assertFalse(processed[1])
+        self.assertEqual(processed[2]['--bob'], 'kate')
 
         # providing arguments in '-name val' form is _not_ allowed
         sys.argv = ['zopeskel', 'archetype', 'my.project', '-bob', 'kate']
@@ -114,12 +114,12 @@ class test_zopeskel(unittest.TestCase):
         # non-existent templates are not caught until in 'run'
         sys.argv = ['zopeskel', 'no-template', 'my.package']
         output = run()
-        self.failUnless('ERROR: No such template' in output)
+        self.assertTrue('ERROR: No such template' in output)
 
         # calling the script with no arguments at all prints usage
         sys.argv = sys.argv[:1]
         output = run()
-        self.failUnless('Usage:' in output)
+        self.assertTrue('Usage:' in output)
 
         sys.argv = oldargv
 
@@ -130,7 +130,7 @@ class test_zopeskel(unittest.TestCase):
         # --help produces the DESCRIPTION string
         sys.argv = ['zopeskel', '--help']
         output = run()
-        self.failUnless(DESCRIPTION in output,
+        self.assertTrue(DESCRIPTION in output,
                         '--help produces incorrect output: %s' % output)
 
         # --list produces a verbose list of all templates by category
@@ -142,11 +142,11 @@ class test_zopeskel(unittest.TestCase):
         tempnames = [t['name'] for t in templates]
         tempsums = [t['summary'] for t in templates]
         for cat in catnames:
-            self.failUnless(cat in output, '%s not in --list output' % cat)
+            self.assertTrue(cat in output, '%s not in --list output' % cat)
         for tname in tempnames:
-            self.failUnless(tname in output, '%s not in --list output' % tname)
+            self.assertTrue(tname in output, '%s not in --list output' % tname)
         for summary in tempsums:
-            self.failUnless(summary in output,
+            self.assertTrue(summary in output,
                             '%s not in --list output' % summary)
 
         # --make-config-file produces a config file with headings for each
@@ -154,14 +154,14 @@ class test_zopeskel(unittest.TestCase):
         sys.argv = ['zopeskel', '--make-config-file']
         output = run()
         for theading in ['[' + name + ']' for name in tempnames]:
-            self.failUnless(theading in output,
+            self.assertTrue(theading in output,
                             '%s does not appear in .zopeskel' % theading)
 
         # --version should output a version number.  make sure it finds
         # something
         sys.argv = ['zopeskel', '--version']
         output = run()
-        self.failIf('unable' in output)
+        self.assertFalse('unable' in output)
 
         sys.argv = oldargv
 

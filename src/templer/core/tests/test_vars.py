@@ -77,10 +77,10 @@ class test_BooleanVar(unittest.TestCase):
         """ check to see that various inputs result in a Boolean Value
         """
         for val in ('f', 'F', 'n', 'N', 'false', 0):
-            self.failIf(self.bvar.validate(val))
+            self.assertFalse(self.bvar.validate(val))
 
         for val in ('t', 'T', 'y', 'Y', 'true', 1):
-            self.failUnless(self.bvar.validate(val))
+            self.assertTrue(self.bvar.validate(val))
 
         self.assertRaises(ValidationException, self.bvar.validate,
                           'humpty-dumpty')
@@ -132,7 +132,7 @@ class test_BoundedIntVar(unittest.TestCase):
         self.defaultminvar = BoundedIntVar('name', 'description', max=10)
         self.defaultmaxvar = BoundedIntVar('name', 'description', min=3)
         self.max = sys.maxint
-        self.min = -self.max-1
+        self.min = -self.max - 1
 
     def testValidation(self):
         """ A BoundedIntVar should take values between min and max (inclusive)
@@ -174,7 +174,7 @@ class test_StringVar(unittest.TestCase):
         validated = self.svar.validate(val)
         self.assertNotEqual(validated[0], ' ')
         self.assertNotEqual(validated[-1], ' ')
-        self.failUnless(validated in val)
+        self.assertTrue(validated in val)
 
         for val in (0, True):
             self.assertRaises(ValidationException, self.svar.validate, val)
@@ -203,7 +203,7 @@ class test_DottedVar(unittest.TestCase):
         """ all parts of a dotted name must be valid python identifiers
         """
         for val in ('this.package', '_foo_.bar', '__class__.__name__'):
-            self.assertEquals(val, self.dvar.validate(val))
+            self.assertEqual(val, self.dvar.validate(val))
 
         for val in ('ham-and-eggs.yummy', 'spam.yucky!'):
             self.assertRaises(ValidationException, self.dvar.validate, val)

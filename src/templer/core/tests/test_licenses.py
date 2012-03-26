@@ -61,7 +61,7 @@ class TestLicenses(unittest.TestCase):
         all_structures = [ep.name for ep\
                           in self.template.all_structure_entry_points()]
         for license in selectable_licenses:
-            self.failUnless(license in all_structures)
+            self.assertTrue(license in all_structures)
 
     def test_license_structure(self):
         """ verify that all license structures are well formed
@@ -82,21 +82,21 @@ class TestLicenses(unittest.TestCase):
                                      self.license_vars)
 
             top = os.listdir(self.tempdir)
-            self.failUnless('docs' in top,
+            self.assertTrue('docs' in top,
                             'failed to write the docs directory')
             expected = LICENSE_EXPECTATIONS[this_license]
             docs = os.listdir(os.path.join(self.tempdir, 'docs'))
             for filename in expected:
-                self.failUnless(filename in docs,
+                self.assertTrue(filename in docs,
                                 '%s not found in docs dir' % filename)
 
             bpfh = open(os.path.join(self.tempdir, 'docs', expected[0]), 'r')
             bp = bpfh.read()
-            self.failUnless(self.license_vars['author'] in bp,
+            self.assertTrue(self.license_vars['author'] in bp,
                             'Author not in license boilerplate')
-            self.failUnless(self.license_vars['project'] in bp,
+            self.assertTrue(self.license_vars['project'] in bp,
                             'Project name not in license boilerplate')
-            self.failUnless(str(this_year) in bp,
+            self.assertTrue(str(this_year) in bp,
                             'Current year not in license boilerplate')
             # clean up
             bpfh.close()

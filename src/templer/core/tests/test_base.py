@@ -59,7 +59,7 @@ class test_base_template(unittest.TestCase):
 
         self.assertEqual(len(hidden), 2)
         for varname in hidden.keys():
-            self.failUnless(varname in easy_vars,
+            self.assertTrue(varname in easy_vars,
                             "missing easy var: %s" % varname)
 
         expert_mode = EXPERT
@@ -67,7 +67,7 @@ class test_base_template(unittest.TestCase):
 
         self.assertEqual(len(hidden), 2)
         for varname in hidden.keys():
-            self.failUnless(varname in expert_vars,
+            self.assertTrue(varname in expert_vars,
                             "missing expert var: %s" % varname)
 
     def test_get_vars(self):
@@ -135,15 +135,15 @@ class test_base_template(unittest.TestCase):
         stack = self.template.get_template_stack(self.command)
         self.assertEqual(len(stack), 1)
 
-        self.failIf(self.template.__class__ in
+        self.assertFalse(self.template.__class__ in
                     [t.__class__ for t in stack], "%s" % stack)
         new_template = NestedNamespace('joe')
-        self.failUnless(new_template.__class__ in
+        self.assertTrue(new_template.__class__ in
                         [t.__class__ for t in stack], "%s" % stack)
 
         errmsg = "%s does not appear to be a subclass of %s"
         for c in [t.__class__ for t in stack]:
-            self.failUnless(isinstance(new_template, c),
+            self.assertTrue(isinstance(new_template, c),
                             errmsg % (new_template, c))
 
     def test_should_print_subcommands(self):
@@ -155,8 +155,8 @@ class test_base_template(unittest.TestCase):
         # doesn't have to actually provide them, just claim that it does)
         n_template.use_local_commands = True
 
-        self.failIf(b_template.should_print_subcommands(self.command))
-        self.failUnless(n_template.should_print_subcommands(self.command))
+        self.assertFalse(b_template.should_print_subcommands(self.command))
+        self.assertTrue(n_template.should_print_subcommands(self.command))
 
 
 def test_suite():
