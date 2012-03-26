@@ -20,7 +20,7 @@ long_description = (
     open('CHANGES.txt').read()
     + '\n')
 
-tests_require=[
+tests_require = [
     'Cheetah',
     'PasteScript'],
 
@@ -30,6 +30,7 @@ setup(name='templer.core',
       long_description=long_description,
       classifiers=[
         "Development Status :: 4 - Beta",
+        "Environment :: Environment :: Console",
         "Framework :: Zope2",
         "Framework :: Zope3",
         "Framework :: Plone",
@@ -47,13 +48,13 @@ setup(name='templer.core',
       keywords='web zope command-line skeleton project',
       author='Cris Ewing',
       author_email='cris@crisewing.com',
-      url='http://svn.plone.org/svn/collective/templer.core',
+      url='https://github.com/collective/templer.core',
       license='MIT',
       packages=find_packages('src'),
       package_dir={'': 'src'},
       namespace_packages=['templer'],
       include_package_data=True,
-      platforms = 'Any',
+      platforms='Any',
       zip_safe=False,
       install_requires=[
           'setuptools',
