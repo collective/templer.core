@@ -1,10 +1,10 @@
 Changelog
 =========
 
-#set $header_text = "%sdev (unreleased)" % $version
+#set $header_text = "%s-dev (unreleased)" % $version
 #set $header_line = "-" * len($header_text)
 $header_text
 $header_line
 
-- Package created using zopeskel
+- Package created using templer
   [${$author or None}]
