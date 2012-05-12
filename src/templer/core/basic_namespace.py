@@ -32,7 +32,7 @@ This creates a Python project without any Zope or Plone features.
             'namespace_package',
             title='Namespace Package Name',
             description='Name of outer namespace package',
-            default='plone',
+            default='my',
             modes=(EXPERT, ),
             page='Namespaces',
             help="""
