@@ -7,9 +7,9 @@ from templer.core.vars import DottedVar
 
 VAR_NS2 = DottedVar(
             'namespace_package2',
-            title='Namespace 2 Package Name',
+            title='Nested Namespace Package Name',
             description='Name of inner namespace package',
-            default='plone',
+            default='nested',
             modes=(EXPERT, ),
             page='Namespaces',
             help="""
@@ -32,6 +32,6 @@ This creates a Python project without any Zope or Plone features.
     use_cheetah = True
 
     vars = copy.deepcopy(BasicNamespace.vars)
-    get_var(vars, 'namespace_package').default = 'plone'
+    get_var(vars, 'namespace_package').default = 'my'
     vars.insert(2, VAR_NS2)
     get_var(vars, 'package').default = 'example'
