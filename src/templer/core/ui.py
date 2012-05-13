@@ -29,6 +29,8 @@ def list_sorted_templates(filter_group=False):
 
     cats = {}
     # grab a list of all paster create template entry points
+    # 
+    # TODO: fix this filtering, post break-up this will not work as expected
     if filter_group:
         t_e_ps = pkg_resources.get_entry_map(
             'zopeskel')['paste.paster_create_template'].values()
