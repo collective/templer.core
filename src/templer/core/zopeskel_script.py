@@ -11,12 +11,12 @@ from templer.core.ui import list_sorted_templates
 USAGE = """
 Usage:
 
-    zopeskel <template> <output-name> [var1=value] ... [varN=value]
+    templer <template> <output-name> [var1=value] ... [varN=value]
 
-    zopeskel --help                Full help
-    zopeskel --list                List template verbosely, with details
-    zopeskel --make-config-file    Output .zopeskel prefs file
-    zopeskel --version             Print installed version
+    templer --help                Full help
+    templer --list                List template verbosely, with details
+    templer --make-config-file    Output .zopeskel prefs file
+    templer --version             Print installed version
 
 %s
 Warning:  use of the --svn-repository argument is not allowed with this script
@@ -38,14 +38,14 @@ Invoking this script
 
 Basic usage::
 
-    zopeskel <template>
+    templer <template>
 
 (To get a list of the templates, run the script without any arguments;
-for a verbose list with full descriptions, run the ``zopeskel --list``)
+for a verbose list with full descriptions, run ``templer --list``)
 
 For example::
 
-    zopeskel archetypes
+    templer archetype
 
 To create an Archetypes-based product for Plone. This will prompt you
 for the name of your product, and for other information about it.
@@ -53,17 +53,17 @@ for the name of your product, and for other information about it.
 If you to specify your output name (resulting product, egg, or buildout,
 depending on the template being used), you can also do so::
 
-    zopeskel <template> <output-name>
+    templer <template> <output-name>
 
 For example::
 
-    zopeskel archetypes Products.Example
+    templer archetype Products.Example
 
 In addition, you can pass variables to this that would be requested
 by that template, and these will then be used. This is an advanced
 feature mostly useful for scripted use of this::
 
-    zopeskel archetypes Products.Example author_email=joel@joelburton.com
+    templer archetype Products.Example author_email=joel@joelburton.com
 
 (You can specify as many of these as you want, in name=value pairs.
 To get the list of variables that a template expects, you can ask for
@@ -108,7 +108,7 @@ You can generate a starter .zopeskel file by running this script with
 the --make-config-file option. This output can be redirected into
 your ``.zopeskel`` file::
 
-    bin/zopeskel --make-config-file > /path/to/home/.zopeskel
+    templer --make-config-file > /path/to/home/.zopeskel
 
 Notes:
 
@@ -134,7 +134,7 @@ Differences from the 'paster create' command
 --------------------------------------------
 
 1) The --svn-repository argument that can be provided to 'paster create' is
-   not allowed when using the zopeskel script.  It will raise an error.  The
+   not allowed when using the templer script.  It will raise an error.  The
    reasons for this are discussed at length in the zopeskel mailing list and
    in the zopeskel issue tracker:
    http://plone.org/products/zopeskel/issues/34
@@ -148,13 +148,13 @@ Differences from the 'paster create' command
 Questions
 ---------
 
-If you have further questions about the usage of bin/zopeskel, please feel
+If you have further questions about the usage of bin/templer, please feel
 free to post your questions to the zopeskel mailing list or jump onto the
 plone IRC channel (#plone) at irc.freenode.net.
 
 
 To see the templates supported, run this script without any options.
-For a verbose listing with help, use ``zopeskel --list``.
+For a verbose listing with help, use ``templer --list``.
 """
 
 DOT_HELP = {
