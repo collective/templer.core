@@ -4,6 +4,13 @@ Changelog
 1.0b-dev (unreleased)
 ---------------------
 
+- Refactored some test setup code for better sharing across packages
+  [cewing]
+
+- Fixed bug in test setup exposed by mixing doc and non-doc tests using
+  os.getcwd()
+  [cewing]
+
 1.0b2 December 8, 2010
 ----------------------
 

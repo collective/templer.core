@@ -115,11 +115,13 @@ def clean_working_set():
 
 
 def testSetUp(test):
+    test.orig_dir = os.getcwd()
     test.temp_dir = tempfile.mkdtemp()
     cd(test.temp_dir)
 
 
 def testTearDown(test):
+    cd(test.orig_dir)
     shutil.rmtree(test.temp_dir, ignore_errors=True)
     test.temp_dir = None
     clean_working_set()
