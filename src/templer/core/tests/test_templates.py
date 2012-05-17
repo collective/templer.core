@@ -99,15 +99,8 @@ def touch(*args, **kwargs):
     open(filename, 'w').write(kwargs.get('data', ''))
 
 
-def testSetUp(test):
-    test.temp_dir = tempfile.mkdtemp()
-    cd(test.temp_dir)
-
-
-def testTearDown(test):
-    shutil.rmtree(test.temp_dir, ignore_errors=True)
-    test.temp_dir = None
-
+def clean_working_set():
+    """remove pkg entries created during tests"""
     from pkg_resources import working_set as ws
     #cleanup entries in the working set
     for k, v in ws.by_key.items():
@@ -119,6 +112,17 @@ def testTearDown(test):
             del ws.entries[i]
 
     sys.path = ws.entries[:]
+
+
+def testSetUp(test):
+    test.temp_dir = tempfile.mkdtemp()
+    cd(test.temp_dir)
+
+
+def testTearDown(test):
+    shutil.rmtree(test.temp_dir, ignore_errors=True)
+    test.temp_dir = None
+    clean_working_set()
 
 
 def doc_suite(test_dir, setUp=testSetUp, tearDown=testTearDown, globs=None):
