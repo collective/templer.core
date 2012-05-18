@@ -40,7 +40,10 @@ you may choose the ``expert`` set, or even choose to answer ``all`` questions
 if you need more control over the final output of your package.
 
 At any time in the question-and-answer process, you may type a ``?`` at the 
-prompt to recieve in-line assistance with the current question.  
+prompt to recieve in-line assistance with the current question.
+
+If you wish to quit the process at any time during the questions, simply enter
+``q`` at the prompt.
 
 Additional Script Functions
 ---------------------------

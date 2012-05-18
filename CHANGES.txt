@@ -1,8 +1,8 @@
 Changelog
 =========
 
-1.0b-dev (unreleased)
----------------------
+1.0b4 May 17, 2012
+------------------
 
 - Refactored test setup code for better sharing across packages
   [cewing]
@@ -30,6 +30,12 @@ Changelog
   [Lazaro Clapp]
 
 - Factor structures code into a separate method so we can use it in vars, too
+  [cewing]
+
+1.0b3 October 6, 2011
+---------------------
+
+- relicense as MIT to keep in sync with ZopeSkel as its internals are replaced
   [cewing]
 
 1.0b2 December 8, 2010
