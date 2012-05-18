@@ -4,11 +4,32 @@ Changelog
 1.0b-dev (unreleased)
 ---------------------
 
-- Refactored some test setup code for better sharing across packages
+- Refactored test setup code for better sharing across packages
   [cewing]
 
 - Fixed bug in test setup exposed by mixing doc and non-doc tests using
   os.getcwd()
+  [cewing]
+
+- Fix packaging problems and normalize setup.py
+  [hvelarde]
+
+- Convert to unittest2 and remove deprecated test assertion aliases
+  [hvelarde]
+
+- Restore support for localcommands as were present in ZopeSkel.  Improve
+  localcommands by making them optional
+  [cewing]
+
+- Provide exit so you can bail from a template run cleanly.  Improve exit 
+  conditions throughout the templer script
+  [cewing]
+
+- Fixed long-standing bug in tests that showed subpackages failing when they
+  in fact succeeded
+  [Lazaro Clapp]
+
+- Factor structures code into a separate method so we can use it in vars, too
   [cewing]
 
 1.0b2 December 8, 2010
