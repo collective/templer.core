@@ -50,6 +50,8 @@ def get_zopeskel_prefs():
 
     # Get defaults from .zopeskel
     config = SafeConfigParser()
+
+    ## TODO: consider how to replace .zopeskel with .templer
     config.read('%s/.zopeskel' % homedir)
     return config
 
@@ -99,12 +101,12 @@ class BaseTemplate(templates.Template):
             default='easy',
             choices=('easy', 'expert', 'all'),
             help="""
-In easy mode, you will be asked fewer, more common questions.
+In 'easy' mode, you will be asked fewer, more common questions.
 
-In expert mode, you will be asked to answer more advanced,
+In 'expert' mode, you will be asked to answer more advanced,
 technical questions.
 
-In all mode, no questions will be skipped--even things like
+In 'all' mode, no questions will be skipped--even things like
 author_email, which would normally be a default set in a
 $HOME/.zopeskel file.
 """),
@@ -126,7 +128,7 @@ $HOME/.zopeskel file.
 
         templates.Template.run(self, command, output_dir, vars)
 
-        # can we make the inclusion of this provisional, based on 
+        # can we make the inclusion of this provisional, based on
         # whether the localcommands package is loaded?
         setup_cfg = os.path.join(output_dir, 'setup.cfg')
         if self.use_local_commands:
@@ -141,12 +143,12 @@ $HOME/.zopeskel file.
             within the scope of this template running [see
             paste.script.create_distro.py]), so we cannot show which
             subtemplates are available.
-            
+
             ^^^ this appears not to be completely true.  The point where
                 this method is run we are in a template which has subcommands
                 and so I believe that it might actually be possible to print
-                a list of those subtemplates which belong to me, since 
-                self.name is the same as the template name used in 
+                a list of those subtemplates which belong to me, since
+                self.name is the same as the template name used in
                 command._list_sub_templates
             """
             plugins = pluginlib.resolve_plugins(['templer.localcommands'])

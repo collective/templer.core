@@ -5,10 +5,10 @@ import unittest2 as unittest
 import sys
 import StringIO
 
-from templer.core.zopeskel_script import checkdots
-from templer.core.zopeskel_script import process_args
-from templer.core.zopeskel_script import run
-from templer.core.zopeskel_script import DESCRIPTION
+from templer.core.control_script import checkdots
+from templer.core.control_script import process_args
+from templer.core.control_script import run
+from templer.core.control_script import DESCRIPTION
 from templer.core.ui import list_sorted_templates
 
 
@@ -29,8 +29,8 @@ def capture_stdout(function):
 run = capture_stdout(run)
 
 
-class test_zopeskel(unittest.TestCase):
-    """Tests for ZopeSkel script.
+class test_control(unittest.TestCase):
+    """Tests for Control script.
     """
 
     def test_checkdots_none(self):
@@ -62,7 +62,7 @@ class test_zopeskel(unittest.TestCase):
         """Ensure process_args correctly processes command-line arguments"""
         oldargv = sys.argv
 
-        sys.argv = ['zopskel']
+        sys.argv = ['templer']
         self.assertRaises(SyntaxError, process_args)
 
         sys.argv.append('archetype')
@@ -91,7 +91,7 @@ class test_zopeskel(unittest.TestCase):
         self.assertEqual(processed[2]['--bob'], 'kate')
 
         # providing arguments in '-name val' form is _not_ allowed
-        sys.argv = ['zopeskel', 'archetype', 'my.project', '-bob', 'kate']
+        sys.argv = ['templer', 'archetype', 'my.project', '-bob', 'kate']
         self.assertRaises(SyntaxError, process_args)
 
         # the --svn-repository argument is _not_ allowed in any form
@@ -112,7 +112,7 @@ class test_zopeskel(unittest.TestCase):
         oldargv = sys.argv
 
         # non-existent templates are not caught until in 'run'
-        sys.argv = ['zopeskel', 'no-template', 'my.package']
+        sys.argv = ['templer', 'no-template', 'my.package']
         output = run()
         self.assertTrue('ERROR: No such template' in output)
 
@@ -128,13 +128,13 @@ class test_zopeskel(unittest.TestCase):
         oldargv = sys.argv
 
         # --help produces the DESCRIPTION string
-        sys.argv = ['zopeskel', '--help']
+        sys.argv = ['templer', '--help']
         output = run()
         self.assertTrue(DESCRIPTION in output,
                         '--help produces incorrect output: %s' % output)
 
         # --list produces a verbose list of all templates by category
-        sys.argv = ['zopeskel', '--list']
+        sys.argv = ['templer', '--list']
         output = run()
         cats = list_sorted_templates()
         catnames = cats.keys()
@@ -151,15 +151,15 @@ class test_zopeskel(unittest.TestCase):
 
         # --make-config-file produces a config file with headings for each
         # template
-        sys.argv = ['zopeskel', '--make-config-file']
+        sys.argv = ['templer', '--make-config-file']
         output = run()
         for theading in ['[' + name + ']' for name in tempnames]:
             self.assertTrue(theading in output,
-                            '%s does not appear in .zopeskel' % theading)
+                            '%s does not appear in .templer' % theading)
 
         # --version should output a version number.  make sure it finds
         # something
-        sys.argv = ['zopeskel', '--version']
+        sys.argv = ['templer', '--version']
         output = run()
         self.assertFalse('unable' in output)
 
@@ -168,7 +168,7 @@ class test_zopeskel(unittest.TestCase):
 
 def test_suite():
     suite = unittest.TestSuite([
-        unittest.makeSuite(test_zopeskel)])
+        unittest.makeSuite(test_control)])
     return suite
 
 if __name__ == '__main__':

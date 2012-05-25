@@ -8,17 +8,21 @@ from paste.script.command import get_commands
 from templer.core.base import wrap_help_paras
 from templer.core.ui import list_sorted_templates
 
+SCRIPT_NAME = "templer"
+
+VERSION_PACKAGES = ['templer.core']
+
 USAGE = """
 Usage:
 
-    templer <template> <output-name> [var1=value] ... [varN=value]
+    %{script_name}s <template> <output-name> [var1=value] ... [varN=value]
 
-    templer --help                Full help
-    templer --list                List template verbosely, with details
-    templer --make-config-file    Output .zopeskel prefs file
-    templer --version             Print installed version
+    %{script_name}s --help                Full help
+    %{script_name}s --list                List template verbosely, with details
+    %{script_name}s --make-config-file    Output .zopeskel prefs file
+    %{script_name}s --version             Print installed version
 
-%s
+%{templates}s
 Warning:  use of the --svn-repository argument is not allowed with this script
 
 For further help information, please invoke this script with the
@@ -38,14 +42,14 @@ Invoking this script
 
 Basic usage::
 
-    templer <template>
+    %{script_name}s <template>
 
 (To get a list of the templates, run the script without any arguments;
-for a verbose list with full descriptions, run ``templer --list``)
+for a verbose list with full descriptions, run ``%{script_name}s --list``)
 
 For example::
 
-    templer archetype
+    %{script_name}s archetype
 
 To create an Archetypes-based product for Plone. This will prompt you
 for the name of your product, and for other information about it.
@@ -53,17 +57,17 @@ for the name of your product, and for other information about it.
 If you to specify your output name (resulting product, egg, or buildout,
 depending on the template being used), you can also do so::
 
-    templer <template> <output-name>
+    %{script_name}s <template> <output-name>
 
 For example::
 
-    templer archetype Products.Example
+    %{script_name}s archetype Products.Example
 
 In addition, you can pass variables to this that would be requested
 by that template, and these will then be used. This is an advanced
 feature mostly useful for scripted use of this::
 
-    templer archetype Products.Example author_email=joel@joelburton.com
+    %{script_name}s archetype Products.Example author_email=joel@joelburton.com
 
 (You can specify as many of these as you want, in name=value pairs.
 To get the list of variables that a template expects, you can ask for
@@ -108,7 +112,7 @@ You can generate a starter .zopeskel file by running this script with
 the --make-config-file option. This output can be redirected into
 your ``.zopeskel`` file::
 
-    templer --make-config-file > /path/to/home/.zopeskel
+    %{script_name}s --make-config-file > /path/to/home/.zopeskel
 
 Notes:
 
@@ -148,13 +152,13 @@ Differences from the 'paster create' command
 Questions
 ---------
 
-If you have further questions about the usage of bin/templer, please feel
+If you have further questions about the usage of bin/%{script_name}s, please feel
 free to post your questions to the zopeskel mailing list or jump onto the
 plone IRC channel (#plone) at irc.freenode.net.
 
 
 To see the templates supported, run this script without any options.
-For a verbose listing with help, use ``templer --list``.
+For a verbose listing with help, use ``%{script_name}s --list``.
 """
 
 DOT_HELP = {
@@ -201,21 +205,25 @@ def checkdots(template, name):
 
 def usage():
     templates = list_printable_templates()
-    print USAGE % templates
+    print USAGE % {'templates': templates,
+                   'script_name': SCRIPT_NAME}
 
 
 def show_help():
-    print DESCRIPTION
+    print DESCRIPTION % {'script_name': SCRIPT_NAME}
 
 
 def show_version():
     # XXX: this always returns the version of templer core, even when
     # called from zopeskel.  We should fix that.
-    try:
-        dist = pkg_resources.get_distribution('templer.core')
-        print dist.version
-    except pkg_resources.DistributionNotFound:
-        print 'unable to identify zopeskel version'
+
+
+    for package in VERSION_PACKAGES:
+        try:
+            dist = pkg_resources.get_distribution(package)
+            print dist.version
+        except pkg_resources.DistributionNotFound:
+            print 'unable to identify %s version' % package
 
 
 def list_verbose():
@@ -311,9 +319,9 @@ def process_args():
             # itself).
             if 'svn-repository' in key:
                 msg = 'for a number of reasons, the --svn-repository argument '
-                msg += 'is not allowed with the zopeskel script. '
+                msg += 'is not allowed with the %s script. '
                 msg += "Try --help for more information"
-                raise SyntaxError(msg)
+                raise SyntaxError(msg % SCRIPT_NAME)
             others[key] = val
         else:
             raise SyntaxError(arg)
