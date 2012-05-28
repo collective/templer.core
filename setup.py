@@ -7,7 +7,7 @@ paste_deploy = "PasteDeploy"
 if sys.version_info[1] < 5:
     paste_deploy += "<1.5.0"
 
-version = '1.0b4'
+version = '1.0b5-dev'
 
 long_description = (
     open('README.txt').read()
