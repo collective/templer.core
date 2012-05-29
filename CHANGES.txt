@@ -4,6 +4,10 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
+- Refactor code in the templer control script to help ease re-use by templer
+  applications like ZopeSkel
+  [cewing]
+
 1.0b4 May 17, 2012
 ------------------
 
