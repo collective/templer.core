@@ -8,21 +8,28 @@ from paste.script.command import get_commands
 from templer.core.base import wrap_help_paras
 from templer.core.ui import list_sorted_templates
 
+def get_templer_packages():
+    """return a list of the templer namespace packages currently installed"""
+    templer_packages = [k for k in pkg_resources.working_set.by_key.keys()\
+        if 'templer' in k.lower()]
+    
+    return templer_packages
+
 SCRIPT_NAME = "templer"
 
-VERSION_PACKAGES = ['templer.core']
+VERSION_PACKAGES = get_templer_packages()
 
 USAGE = """
 Usage:
 
-    %{script_name}s <template> <output-name> [var1=value] ... [varN=value]
+    %(script_name)s <template> <output-name> [var1=value] ... [varN=value]
 
-    %{script_name}s --help                Full help
-    %{script_name}s --list                List template verbosely, with details
-    %{script_name}s --make-config-file    Output .zopeskel prefs file
-    %{script_name}s --version             Print installed version
+    %(script_name)s --help                Full help
+    %(script_name)s --list                List template verbosely, with details
+    %(script_name)s --make-config-file    Output .zopeskel prefs file
+    %(script_name)s --version             Print versions of installed templer packages
 
-%{templates}s
+%(templates)s
 Warning:  use of the --svn-repository argument is not allowed with this script
 
 For further help information, please invoke this script with the
@@ -42,14 +49,14 @@ Invoking this script
 
 Basic usage::
 
-    %{script_name}s <template>
+    %(script_name)s <template>
 
 (To get a list of the templates, run the script without any arguments;
-for a verbose list with full descriptions, run ``%{script_name}s --list``)
+for a verbose list with full descriptions, run ``%(script_name)s --list``)
 
 For example::
 
-    %{script_name}s archetype
+    %(script_name)s archetype
 
 To create an Archetypes-based product for Plone. This will prompt you
 for the name of your product, and for other information about it.
@@ -57,17 +64,17 @@ for the name of your product, and for other information about it.
 If you to specify your output name (resulting product, egg, or buildout,
 depending on the template being used), you can also do so::
 
-    %{script_name}s <template> <output-name>
+    %(script_name)s <template> <output-name>
 
 For example::
 
-    %{script_name}s archetype Products.Example
+    %(script_name)s archetype Products.Example
 
 In addition, you can pass variables to this that would be requested
 by that template, and these will then be used. This is an advanced
 feature mostly useful for scripted use of this::
 
-    %{script_name}s archetype Products.Example author_email=joel@joelburton.com
+    %(script_name)s archetype Products.Example author_email=joel@joelburton.com
 
 (You can specify as many of these as you want, in name=value pairs.
 To get the list of variables that a template expects, you can ask for
@@ -112,7 +119,7 @@ You can generate a starter .zopeskel file by running this script with
 the --make-config-file option. This output can be redirected into
 your ``.zopeskel`` file::
 
-    %{script_name}s --make-config-file > /path/to/home/.zopeskel
+    %(script_name)s --make-config-file > /path/to/home/.zopeskel
 
 Notes:
 
@@ -152,13 +159,13 @@ Differences from the 'paster create' command
 Questions
 ---------
 
-If you have further questions about the usage of bin/%{script_name}s, please feel
+If you have further questions about the usage of bin/%(script_name)s, please feel
 free to post your questions to the zopeskel mailing list or jump onto the
 plone IRC channel (#plone) at irc.freenode.net.
 
 
 To see the templates supported, run this script without any options.
-For a verbose listing with help, use ``%{script_name}s --list``.
+For a verbose listing with help, use ``%(script_name)s --list``.
 """
 
 DOT_HELP = {
@@ -213,18 +220,33 @@ def show_help():
     print DESCRIPTION % {'script_name': SCRIPT_NAME}
 
 
-def show_version():
-    # XXX: this always returns the version of templer core, even when
-    # called from zopeskel.  We should fix that.
-
-
+def format_version():
+    """created a printable string of installed templer version numbers
+    """
+    s = StringIO()
+    version_info = []
     for package in VERSION_PACKAGES:
         try:
             dist = pkg_resources.get_distribution(package)
-            print dist.version
+            version_info.append((dist.project_name, dist.version, ))
         except pkg_resources.DistributionNotFound:
             print 'unable to identify %s version' % package
+    maxpkg = max([len(vi[0]) for vi in version_info])
+    maxver = max([len(vi[1]) for vi in version_info])
+    print >>s, "\n| Installed Templer Package Versions"
+    print >>s, "+" + ("-" * (maxpkg + maxver + 3))
+    for vi in version_info:
+        padding = maxpkg - len(vi[0])
+        values = [vi[0], ' ' * padding, vi[1]]
+        print >>s, "| %s:%s %s" % tuple(values)
+    s.seek(0)
+    return s.read()
 
+
+def show_version():
+    """display the name and version number of all installed templer packages
+    """
+    print format_version()
 
 def list_verbose():
     """List templates verbosely, with full help."""
