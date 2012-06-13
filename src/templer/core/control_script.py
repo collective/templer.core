@@ -8,16 +8,14 @@ from paste.script.command import get_commands
 from templer.core.base import wrap_help_paras
 from templer.core.ui import list_sorted_templates
 
+
 def get_templer_packages():
     """return a list of the templer namespace packages currently installed"""
     templer_packages = [k for k in pkg_resources.working_set.by_key.keys()\
         if 'templer' in k.lower()]
-    
+
     return templer_packages
 
-SCRIPT_NAME = "templer"
-
-VERSION_PACKAGES = get_templer_packages()
 
 USAGE = """
 Usage:
@@ -26,8 +24,9 @@ Usage:
 
     %(script_name)s --help                Full help
     %(script_name)s --list                List template verbosely, with details
-    %(script_name)s --make-config-file    Output .zopeskel prefs file
-    %(script_name)s --version             Print versions of installed templer packages
+    %(script_name)s --make-config-file    Output %(dotfile_name)s prefs file
+    %(script_name)s --version             Print versions of installed templer
+                                          packages
 
 %(templates)s
 Warning:  use of the --svn-repository argument is not allowed with this script
@@ -35,6 +34,7 @@ Warning:  use of the --svn-repository argument is not allowed with this script
 For further help information, please invoke this script with the
 option "--help".
 """
+
 
 DESCRIPTION = """
 This script allows you to create basic skeletons for plone and zope
@@ -113,7 +113,7 @@ For example, our ``$HOME/.zopeskel`` could contain::
     [plone3_theme]
     empty_styles = False
     license_name = BSD
-    keywords = %(master_keywords)s additional keywords
+    keywords = ${master_keywords} additional keywords
 
 You can generate a starter .zopeskel file by running this script with
 the --make-config-file option. This output can be redirected into
@@ -159,14 +159,15 @@ Differences from the 'paster create' command
 Questions
 ---------
 
-If you have further questions about the usage of bin/%(script_name)s, please feel
-free to post your questions to the zopeskel mailing list or jump onto the
+If you have further questions about the usage of bin/%(script_name)s, please
+feel free to post your questions to the zopeskel mailing list or jump onto the
 plone IRC channel (#plone) at irc.freenode.net.
 
 
 To see the templates supported, run this script without any options.
 For a verbose listing with help, use ``%(script_name)s --list``.
 """
+
 
 DOT_HELP = {
   0: """
@@ -183,264 +184,341 @@ namespace', like 'foo.bar.baz').
 """}
 
 
-def checkdots(template, name):
-    """Check if project name appears legal, given template requirements.
-
-    Templates can provide number of namespaces they expect (provided
-    in 'ndots' attributes for number-of-dots in name). This checks that
-    provided project name is has correct number of namespaces and that
-    each part is a legal Python identifier.
-    """
-    msg = "Not a valid Python dotted name: %s ('%s' is not an identifier)"
-    ndots = getattr(template, 'ndots', None)
-    if ndots is None:
-        return   # No validation possible
-
-    cdots = name.count(".")
-    if ndots != cdots:
-        raise ValueError(
-            "Project name expected %i dots, supplied '%s' has %i dots" % (
-                ndots, name, cdots))
-    for part in name.split("."):
-        # Check if Python identifier,
-        # http://code.activestate.com/recipes/413487/
-        try:
-            class test(object): __slots__ = [part]
-        except TypeError:
-            raise ValueError(msg % (name, part))
-
-
-def usage():
-    templates = list_printable_templates()
-    print USAGE % {'templates': templates,
-                   'script_name': SCRIPT_NAME}
-
-
-def show_help():
-    print DESCRIPTION % {'script_name': SCRIPT_NAME}
-
-
-def format_version():
-    """created a printable string of installed templer version numbers
-    """
-    s = StringIO()
-    version_info = []
-    for package in VERSION_PACKAGES:
-        try:
-            dist = pkg_resources.get_distribution(package)
-            version_info.append((dist.project_name, dist.version, ))
-        except pkg_resources.DistributionNotFound:
-            print 'unable to identify %s version' % package
-    maxpkg = max([len(vi[0]) for vi in version_info])
-    maxver = max([len(vi[1]) for vi in version_info])
-    print >>s, "\n| Installed Templer Package Versions"
-    print >>s, "+" + ("-" * (maxpkg + maxver + 3))
-    for vi in version_info:
-        padding = maxpkg - len(vi[0])
-        values = [vi[0], ' ' * padding, vi[1]]
-        print >>s, "| %s:%s %s" % tuple(values)
-    s.seek(0)
-    return s.read()
-
-
-def show_version():
-    """display the name and version number of all installed templer packages
-    """
-    print format_version()
-
-def list_verbose():
-    """List templates verbosely, with full help."""
-    textwrapper = TextWrapper(
-            initial_indent="   ", subsequent_indent="   ")
-    cats = list_sorted_templates()
-
-    for title, items in cats.items():
-        print "\n"+ title
-        print "-" * len(title)
-        for temp in items:
-            print "\n%s: %s\n" % (temp['name'], temp['summary'])
-            if temp['help']:
-                wrap_help_paras(textwrapper, temp['help'])
-    print
-
-
-def list_printable_templates():
-    """
-    Printable list of all templates, sorted into two categories.
-    """
-
-    s = StringIO()
-
-    cats = list_sorted_templates()
-    templates = sum(cats.values(), [])   # flatten into single list
-    max_name = max([len(x['name']) for x in templates])
-
-    for title, items in cats.items():
-        print >>s, "\n%s\n" % title
-        for entry in items:
-            print >>s, "|  %s:%s %s\n" % (
-                 entry['name'],
-                ' '*(max_name-len(entry['name'])),
-                entry['summary']),
-
-    s.seek(0)
-    return s.read()
-
-
-def generate_dotzopeskel():
-    """Make an example .zopeskel file for user."""
-
-    cats = list_sorted_templates()
-    print """
-
-# This file can contain preferences for zopeskel.
-# To do so, uncomment the lines that look like:
+DOTFILE_HEADER = """
+# This file allows you to set default values for %(script_name)s.
+# To set a global default, uncomment any line that looks like:
 #    variable_name = Default Value
 
 [DEFAULT]
 """
-    for temp in sum(cats.values(), []):
-        print "\n[%(name)s]\n" % temp
-        tempc = temp['entry'].load()
-        for var in tempc.vars:
-            if hasattr(var, 'pretty_description'):
-                print "# %s" % var.pretty_description()
-            print "# %s = %s\n" % (var.name, var.default)
 
 
-def process_args():
-    """ return a tuple of template_name, output_name and everything else
-
-        everything else will be returned as a dictionary of key/value pairs
-    """
-    args = sys.argv[1:]
-    try:
-        template_name = args.pop(0)
-    except IndexError:
-        raise SyntaxError('No template name provided')
-    output_name = None
-    others = {}
-    for arg in args:
-        eq_index = arg.find('=')
-        if eq_index == -1 and not output_name:
-            output_name = arg
-        elif eq_index > 0:
-            key, val = arg.split('=')
-            # the --svn-repository argument to paster does some things that
-            # cause it to be pretty much incompatible with zopeskel. See the
-            # following zopeskel issues:
-            #     http://plone.org/products/zopeskel/issues/35
-            #     http://plone.org/products/zopeskel/issues/34
-            # For this reason, we are going to disallow using the
-            # --svn-repository argument when using the zopeskel wrapper.
-            #
-            # Those who wish to use it can still do so by going back to paster,
-            # with the caveat that there are some templates (particularly the
-            # buildout ones) for which the argument will always throw errors
-            # (at least until the problems are fixed upstream in paster
-            # itself).
-            if 'svn-repository' in key:
-                msg = 'for a number of reasons, the --svn-repository argument '
-                msg += 'is not allowed with the %s script. '
-                msg += "Try --help for more information"
-                raise SyntaxError(msg % SCRIPT_NAME)
-            others[key] = val
-        else:
-            raise SyntaxError(arg)
-
-    return template_name, output_name, others
-
-
-def run():
-    """ """
-
-    if "--help" in sys.argv:
-        show_help()
-        sys.exit(0)
-
-    if "--make-config-file" in sys.argv:
-        generate_dotzopeskel()
-        sys.exit(0)
-
-    if "--list" in sys.argv:
-        list_verbose()
-        sys.exit(0)
-
-    if "--version" in sys.argv:
-        show_version()
-        sys.exit(0)
-
-    if len(sys.argv) == 1:
-        usage()
-        sys.exit(0)
-
-    try:
-        template_name, output_name, opts = process_args()
-    except SyntaxError, e:
-        usage()
-        print "ERROR: There was a problem with your arguments: %s\n" % str(e)
-        sys.exit(1)
-
-    rez = pkg_resources.iter_entry_points(
-            'paste.paster_create_template',
-            template_name)
-    rez = list(rez)
-    if not rez:
-        usage()
-        print "ERROR: No such template: %s\n" % template_name
-        sys.exit(1)
-
-    template = rez[0].load()
-
-    print "\n%s: %s" % (template_name, template.summary)
-    help = getattr(template, 'help', None)
-    if help:
-        print template.help
-
-    create = get_commands()['create'].load()
-
-    command = create('create')
-
-    if output_name:
-        try:
-            checkdots(template, output_name)
-        except ValueError, e:
-            print "ERROR: %s\n" % str(e)
-            sys.exit(1)
-
-    else:
-        ndots = getattr(template, 'ndots', None)
-        help = DOT_HELP.get(ndots)
-
-        while True:
-            if help:
-                print help
-            try:
-                challenge = "Enter project name (or q to quit)"
-                output_name = command.challenge(challenge)
-                if output_name == 'q':
-                    print "\n\nExiting...\n"
-                    sys.exit(0)
-                checkdots(template, output_name)
-            except ValueError, e:
-                print "\nERROR: %s" % e
-            else:
-                break
-
-
-    print """
+HELP_PROMPT = """
 If at any point, you need additional help for a question, you can enter
 '?' and press RETURN.
 """
 
-    optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
-    if output_name is not None:
-        optslist.insert(0, output_name)
-    try:
-        command.run(['-q', '-t', template_name] + optslist)
-    except KeyboardInterrupt:
-        print "\n\nExiting...\n"
-    except Exception, e:
-        print "\nERROR: %s\n" % str(e)
-        sys.exit(1)
-    sys.exit(0)
+
+SVN_WARNING = """
+For a number of reasons, the --svn-repository argument is not supported
+with the %s script. Try --help for more information.
+"""
+
+
+ID_WARNING = "Not a valid Python dotted name: %s ('%s' is not an identifier)"
+
+
+class Runner(object):
+    """encapsulates command-line interactions
+
+    Override public API methods to change behaviors
+    """
+    texts = {
+        'usage': USAGE,
+        'description': DESCRIPTION,
+        'dot_help': DOT_HELP,
+        'dotfile_header': DOTFILE_HEADER,
+        'help_prompt': HELP_PROMPT,
+        'svn_warning': SVN_WARNING,
+        'id_warning': ID_WARNING,
+    }
+    name = 'templer'
+    dotfile = '.templer'
+
+    def __init__(self, name=None, versions=None, dotfile=None, texts={}):
+        """initialize a runner with the given name"""
+        if name is not None:
+            self.name = name
+        # if versions is not passed, default to getting all installed
+        # templer packages
+        if versions is not None:
+            if not isinstance(versions, (list, tuple)):
+                versions = [versions, ]
+        else:
+            versions = self._get_templer_packages()
+        self.versions = versions
+
+        if dotfile is not None:
+            self.dotfile = dotfile
+
+        if not isinstance(texts, dict):
+            raise ValueError("If passed, texts argument must be a dict")
+        self.texts.update(texts)
+
+    def __call__(self, argv):
+        """command-line interaction and template execution
+
+        argv should be passed in as sys.argv[1:]
+        """
+        try:
+            template_name, output_name, opts = self._process_args(argv)
+        except SyntaxError, e:
+            self.usage(exit=False)
+            msg = "ERROR: There was a problem with your arguments: %s\n"
+            print msg % str(e)
+            sys.exit(1)
+
+        rez = pkg_resources.iter_entry_points(
+                'paste.paster_create_template',
+                template_name)
+        rez = list(rez)
+        if not rez:
+            self.usage(exit=False)
+            print "ERROR: No such template: %s\n" % template_name
+            sys.exit(1)
+
+        template = rez[0].load()
+        print "\n%s: %s" % (template_name, template.summary)
+        help = getattr(template, 'help', None)
+        if help:
+            print template.help
+
+        create = get_commands()['create'].load()
+        command = create('create')
+
+        if output_name:
+            try:
+                self._checkdots(template, output_name)
+            except ValueError, e:
+                print "ERROR: %s\n" % str(e)
+                sys.exit(1)
+        else:
+            ndots = getattr(template, 'ndots', None)
+            help = DOT_HELP.get(ndots)
+            while True:
+                if help:
+                    print help
+                try:
+                    challenge = "Enter project name (or q to quit)"
+                    output_name = command.challenge(challenge)
+                    if output_name == 'q':
+                        print "\n\nExiting...\n"
+                        sys.exit(0)
+                    self._checkdots(template, output_name)
+                except ValueError, e:
+                    print "\nERROR: %s" % e
+                else:
+                    break
+
+        print self.texts['help_prompt']
+
+        optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
+        if output_name is not None:
+            optslist.insert(0, output_name)
+        try:
+            command.run(['-q', '-t', template_name] + optslist)
+        except KeyboardInterrupt:
+            print "\n\nExiting...\n"
+            sys.exit(0)
+        except Exception, e:
+            print "\nERROR: %s\n" % str(e)
+            sys.exit(1)
+        sys.exit(0)
+
+    # Public API methods, can be overridden by templer-based applications
+    def show_help(self):
+        """display help text"""
+        print self.texts['description'] % {'script_name': self.name}
+        sys.exit(0)
+
+    def generate_dotfile(self):
+        """generate a dotfile to hold default values
+
+        method must exit by raising error or calling sys.exit
+        """
+
+        cats = list_sorted_templates()
+        print self.texts['dotfile_header'] % {'script_name': self.name}
+        for temp in sum(cats.values(), []):
+            print "\n[%(name)s]\n" % temp
+            tempc = temp['entry'].load()
+            for var in tempc.vars:
+                if hasattr(var, 'pretty_description'):
+                    print "# %s" % var.pretty_description()
+                print "# %s = %s\n" % (var.name, var.default)
+        sys.exit(0)
+
+    def list_verbose(self):
+        """list available templates and their help text
+
+        method must exit by raising error or calling sys.exit
+        """
+        textwrapper = TextWrapper(
+            initial_indent="   ", subsequent_indent="   ")
+        cats = list_sorted_templates()
+
+        for title, items in cats.items():
+            print "\n"+ title
+            print "-" * len(title)
+            for temp in items:
+                print "\n%s: %s\n" % (temp['name'], temp['summary'])
+                if temp['help']:
+                    wrap_help_paras(textwrapper, temp['help'])
+        print
+        sys.exit(0)
+
+    def show_version(self):
+        """show installed version of packages listed in self.versions
+
+        method must exit by raising error or calling sys.exit
+        """
+        version_info = self._get_version_info()
+        print self._format_version_info(
+            version_info, "Installed Templer Packages")
+        sys.exit(0)
+
+    def usage(self, exit=True):
+        """print usage message
+
+        method must exit by raising error or calling sys.exit
+        """
+        templates = self._list_printable_templates()
+        print self.texts['usage'] % {'templates': templates,
+                                     'script_name': self.name,
+                                     'dotfile_name': self.dotfile}
+        if exit:
+            sys.exit(0)
+
+    # Private API supporting command-line flags
+    # should not need to be changed by templer-based applications
+    def _get_templer_packages(self):
+        """return a list of the templer namespace packages currently installed
+        """
+        templer_packages = [k for k in pkg_resources.working_set.by_key.keys()\
+            if 'templer' in k.lower()]
+        return templer_packages
+
+    def _get_version_info(self):
+        """provided a list of distribution names, return version info for them
+        """
+        version_info = []
+        for package_name in self.versions:
+            try:
+                dist = pkg_resources.get_distribution(package_name)
+                version_info.append((dist.project_name, dist.version, ))
+            except pkg_resources.DistributionNotFound:
+                version_info.append((package_name, 'Not Installed'))
+        return version_info
+
+    def _format_version_info(self, version_info, header=None):
+        """created a printable string of installed package version numbers
+        """
+        s = StringIO()
+        maxpkg = max([len(vi[0]) for vi in version_info])
+        maxver = max([len(vi[1]) for vi in version_info])
+        if header is not None:
+            print >>s, "\n| %s" % header
+            print >>s, "+" + ("-" * (maxpkg + maxver + 3))
+        for vi in version_info:
+            padding = maxpkg - len(vi[0])
+            values = [vi[0], ' ' * padding, vi[1]]
+            print >>s, "| %s:%s %s" % tuple(values)
+        s.seek(0)
+        return s.read()
+
+    def _list_printable_templates(self):
+        """
+        Printable list of all templates, sorted into categories.
+        """
+        s = StringIO()
+        cats = list_sorted_templates()
+        templates = sum(cats.values(), [])   # flatten into single list
+        max_name = max([len(x['name']) for x in templates])
+        for title, items in cats.items():
+            print >>s, "\n%s\n" % title
+            for entry in items:
+                print >>s, "|  %s:%s %s\n" % (
+                     entry['name'],
+                    ' '*(max_name-len(entry['name'])),
+                    entry['summary']),
+        s.seek(0)
+        return s.read()
+
+    # Private API supporting the template run itself
+    # these methods should not need modification by templer-based applications
+    def _process_args(self, args):
+        """return a tuple of template_name, output_name and everything else
+
+        everything else will be returned as a dictionary of key/value pairs
+        """
+        try:
+            template_name = args.pop(0)
+        except IndexError:
+            raise SyntaxError('No template name provided')
+        output_name = None
+        others = {}
+        for arg in args:
+            eq_index = arg.find('=')
+            if eq_index == -1 and not output_name:
+                output_name = arg
+            elif eq_index > 0:
+                key, val = arg.split('=')
+                # the --svn-repository argument to paster does some things that
+                # cause it to be pretty much incompatible with zopeskel. See
+                # the following zopeskel issues:
+                #     http://plone.org/products/zopeskel/issues/35
+                #     http://plone.org/products/zopeskel/issues/34
+                # For this reason, we are going to disallow using the
+                # --svn-repository argument when using the zopeskel wrapper.
+                #
+                # Those who wish to use it can still do so by going back to
+                # paster, with the caveat that there are some templates
+                # (particularly the buildout ones) for which the argument will
+                # always throw errors (at least until the problems are fixed
+                # upstream in paster itself).
+                if 'svn-repository' in key:
+                    raise SyntaxError(self.texts['svn_warning'] % self.name)
+                others[key] = val
+            else:
+                raise SyntaxError(arg)
+
+        return template_name, output_name, others
+
+    def _checkdots(self, template, name):
+        """Check if project name appears legal, given template requirements.
+
+        Templates can provide the number of namespaces they expect (provided
+        in 'ndots' attributes for number-of-dots in name). This method
+        validates that the provided project name has the expected number of
+        namespaces and that each part is a legal Python identifier.
+        """
+        ndots = getattr(template, 'ndots', None)
+        if ndots is None:
+            return   # No validation possible
+
+        cdots = name.count(".")
+        if ndots != cdots:
+            raise ValueError(
+                "Project name expected %i dots, supplied '%s' has %i dots" % (
+                    ndots, name, cdots))
+        for part in name.split("."):
+            # Check if Python identifier,
+            # http://code.activestate.com/recipes/413487/
+            try:
+                class test(object): __slots__ = [part]
+            except TypeError:
+                raise ValueError(self.texts['id_warning'] % (name, part))
+
+
+templer_runner = Runner()
+
+
+def run(runner=templer_runner):
+
+    if "--help" in sys.argv:
+        runner.show_help()
+
+    if "--make-config-file" in sys.argv:
+        runner.generate_dotfile()
+
+    if "--list" in sys.argv:
+        runner.list_verbose()
+
+    if "--version" in sys.argv:
+        runner.show_version()
+
+    if len(sys.argv) == 1:
+        runner.usage()
+
+    args = sys.argv[1:]
+    runner(args)
