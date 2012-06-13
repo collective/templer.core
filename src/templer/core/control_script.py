@@ -145,9 +145,9 @@ Differences from the 'paster create' command
 --------------------------------------------
 
 1) The --svn-repository argument that can be provided to 'paster create' is
-   not allowed when using the templer script.  It will raise an error.  The
-   reasons for this are discussed at length in the zopeskel mailing list and
-   in the zopeskel issue tracker:
+   not allowed when using the %(script_name)s script.  It will raise an error.  
+   The reasons for this are discussed at length in the zopeskel mailing list 
+   and in the zopeskel issue tracker:
    http://plone.org/products/zopeskel/issues/34
    http://plone.org/products/zopeskel/issues/35
 
@@ -223,7 +223,7 @@ class Runner(object):
         'id_warning': ID_WARNING,
     }
     name = 'templer'
-    dotfile = '.templer'
+    dotfile = '.zopeskel'
 
     def __init__(self, name=None, versions=None, dotfile=None, texts={}):
         """initialize a runner with the given name"""
@@ -372,6 +372,7 @@ class Runner(object):
 
         method must exit by raising error or calling sys.exit
         """
+        import pdb; pdb.set_trace( )
         templates = self._list_printable_templates()
         print self.texts['usage'] % {'templates': templates,
                                      'script_name': self.name,
