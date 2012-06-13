@@ -113,7 +113,7 @@ For example, our ``$HOME/.zopeskel`` could contain::
     [plone3_theme]
     empty_styles = False
     license_name = BSD
-    keywords = ${master_keywords} additional keywords
+    keywords = %%(master_keywords)s additional keywords
 
 You can generate a starter .zopeskel file by running this script with
 the --make-config-file option. This output can be redirected into
