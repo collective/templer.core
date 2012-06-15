@@ -372,7 +372,6 @@ class Runner(object):
 
         method must exit by raising error or calling sys.exit
         """
-        import pdb; pdb.set_trace( )
         templates = self._list_printable_templates()
         print self.texts['usage'] % {'templates': templates,
                                      'script_name': self.name,
