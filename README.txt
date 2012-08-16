@@ -71,3 +71,23 @@ following::
 
     $ python setup.py test
 
+Debugging template issues
+===========================
+
+If you have problems to execute templates like::
+
+    Error in file /Users/mikko/code/mobilize/src/templer.plone/src/templer/plone/templates/nested_plone/setup.py_tmpl:
+    
+    ERROR: 'str' object has no attribute 'VFFSL'
+
+Run the templates against pure Paster to get a meaningful traceback::
+
+    [~/code/mobilize/src]% ../bin/paster create -t plone_nested plone.app.mobile
+    Selected and implied templates:
+      templer.core#nested_namespace  A basic Python project with a nested namespace (2 dots in name)
+      templer.plone#plone_nested     A package for Plone add-ons with a nested namespace
+    ...
+      File "/Users/mikko/code/plone-venv/lib/python2.7/site-packages/Cheetah-2.2.1-py2.7-macosx-10.8-x86_64.egg/Cheetah/Template.py", line 997, in __str__
+        return getattr(self, mainMethName)()
+      File "cheetah_DynamicallyCompiledCheetahTemplate_1345114853_72_55242.py", line 147, in respond
+    AttributeError: 'str' object has no attribute 'VFFSL'
