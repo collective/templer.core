@@ -78,7 +78,7 @@ feature mostly useful for scripted use of this::
 
 (You can specify as many of these as you want, in name=value pairs.
 To get the list of variables that a template expects, you can ask for
-this with ``paster create -t <template-name> --list-variables``).
+this with ``%(script_name)s  <template> --list-variables``).
 
 
 Interactive Help
