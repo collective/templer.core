@@ -48,6 +48,10 @@ class EggDocsStructure(Structure):
     _structure_dir = 'structures/egg_docs'
 
 
+class AGPL3Structure(Structure):
+    _structure_dir = 'structures/licenses/agpl3'
+
+
 class ASLStructure(Structure):
     _structure_dir = 'structures/licenses/asl'
 

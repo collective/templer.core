@@ -15,6 +15,7 @@ from templer.core.vars import ValidationException
 
 
 LICENSE_CATEGORIES = {
+    'AGPL3': 'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     'ASL': 'License :: OSI Approved :: Apache Software License',
     'BSD': 'License :: OSI Approved :: BSD License',
     'EFL': 'License :: Eiffel Forum License (EFL)',

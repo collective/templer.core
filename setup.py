@@ -76,6 +76,7 @@ setup(name='templer.core',
 
         [templer.templer_structure]
         egg_docs = templer.core.structures:EggDocsStructure
+        agpl3 = templer.core.structures:AGPL3Structure
         asl = templer.core.structures:ASLStructure
         bsd = templer.core.structures:BSDStructure
         efl = templer.core.structures:EFLStructure
