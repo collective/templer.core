@@ -5,10 +5,10 @@ import unittest2 as unittest
 import sys
 import StringIO
 
-from templer.core.control_script import checkdots
-from templer.core.control_script import process_args
+# from templer.core.control_script import checkdots
+# from templer.core.control_script import process_args
 from templer.core.control_script import run
-from templer.core.control_script import DESCRIPTION
+from templer.core.control_script import Runner
 from templer.core.ui import list_sorted_templates
 
 
@@ -33,107 +33,119 @@ class test_control(unittest.TestCase):
     """Tests for Control script.
     """
 
-    def test_checkdots_none(self):
-        """Verify that checkdots works with templates without ndots hint."""
-
+    def setUp(self):
         class FauxTemplate:
             pass
-        t = FauxTemplate()
 
-        checkdots(t, "anything is legal; not a package")
+        self.runner = Runner()
+        self.template = FauxTemplate()
+
+    def test_checkdots_none(self):
+        """Verify that checkdots works with templates without ndots hint."""
+        try:
+            self.runner._checkdots(self.template,
+                                   "anything is legal; not a package")
+        except ValueError:
+            self.fail('checkdots should not have failed with no ndots')
 
     def test_checkdots_two(self):
         """Verify that checkdots validates templates with ndots hint."""
 
-        class FauxTemplate:
-            pass
-        t = FauxTemplate()
+        self.template.ndots = 2
 
-        t.ndots = 2
+        for bad in ["nodots", "one.dot", "three.dots.in.this",
+                    "two.dots.but not legal"]:
+            self.assertRaises(ValueError, self.runner._checkdots,
+                              self.template, bad)
 
-        self.assertRaises(ValueError, checkdots, t, "nodots")
-        self.assertRaises(ValueError, checkdots, t, "one.dot")
-        self.assertRaises(ValueError, checkdots, t, "three.dots.in.this")
-        self.assertRaises(ValueError, checkdots, t, "two.dots.but not legal")
-
-        checkdots(t, "two.dots.legal")
+        try:
+            self.runner._checkdots(self.template, "two.dots.legal")
+        except ValueError:
+            self.fail('checkdots should not have failed')
 
     def test_process_args(self):
         """Ensure process_args correctly processes command-line arguments"""
-        oldargv = sys.argv
+        argv = []
 
-        sys.argv = ['templer']
-        self.assertRaises(SyntaxError, process_args)
+        self.assertRaises(SyntaxError, self.runner._process_args, argv[:])
 
-        sys.argv.append('archetype')
-        processed = process_args()
+        argv.append('archetype')
+        processed = self.runner._process_args(argv[:])
         self.assertEqual(processed[0], 'archetype')
         self.assertFalse(processed[1])
         self.assertFalse(processed[2])
 
-        sys.argv.append('my.project')
-        processed = process_args()
+        argv.append('my.project')
+        processed = self.runner._process_args(argv[:])
         self.assertEqual(processed[0], 'archetype')
         self.assertEqual(processed[1], 'my.project')
         self.assertFalse(processed[2])
 
-        sys.argv.append('--bob=kate')
-        processed = process_args()
+        argv.append('--bob=kate')
+        processed = self.runner._process_args(argv[:])
         self.assertEqual(processed[0], 'archetype')
         self.assertEqual(processed[1], 'my.project')
         self.assertEqual(processed[2]['--bob'], 'kate')
 
-        # process_args will allow us to skip the project name argument
-        sys.argv.pop(2)
-        processed = process_args()
+        # _process_args will allow us to skip the project name argument
+        argv.pop(1)
+        processed = self.runner._process_args(argv[:])
         self.assertEqual(processed[0], 'archetype')
         self.assertFalse(processed[1])
         self.assertEqual(processed[2]['--bob'], 'kate')
 
         # providing arguments in '-name val' form is _not_ allowed
-        sys.argv = ['templer', 'archetype', 'my.project', '-bob', 'kate']
-        self.assertRaises(SyntaxError, process_args)
+        argv = ['archetype', 'my.project', '-bob', 'kate']
+        self.assertRaises(SyntaxError, self.runner._process_args, argv[:])
 
         # the --svn-repository argument is _not_ allowed in any form
-        sys.argv = sys.argv[:3] + ['--svn-repository=svn://svn.junk.org/svn']
-        self.assertRaises(SyntaxError, process_args)
+        argv = argv[:2] + ['--svn-repository=svn://svn.junk.org/svn']
+        self.assertRaises(SyntaxError, self.runner._process_args, argv[:])
 
-        sys.argv[3] = 'svn-repository=svn://svn.junk.org/svn/blah'
-        self.assertRaises(SyntaxError, process_args)
+        argv[2] = 'svn-repository=svn://svn.junk.org/svn/blah'
+        self.assertRaises(SyntaxError, self.runner._process_args, argv[:])
 
         # providing args in a '-name val' format is not supported
-        sys.argv = sys.argv[:3] + ['bob', 'kate']
-        self.assertRaises(SyntaxError, process_args)
+        argv = argv[:2] + ['bob', 'kate']
+        self.assertRaises(SyntaxError, self.runner._process_args, argv[:])
 
-        sys.argv = oldargv
-
+    
     def test_script_errors(self):
         """Verify that the run method catches errors correctly"""
         oldargv = sys.argv
-
+    
         # non-existent templates are not caught until in 'run'
         sys.argv = ['templer', 'no-template', 'my.package']
         output = run()
         self.assertTrue('ERROR: No such template' in output)
-
+    
         # calling the script with no arguments at all prints usage
         sys.argv = sys.argv[:1]
         output = run()
         self.assertTrue('Usage:' in output)
-
+    
         sys.argv = oldargv
 
-    def test_script_features(self):
-        """Verify that the help features of the script function correctly"""
+    def test_show_help(self):
         oldargv = sys.argv
 
         # --help produces the DESCRIPTION string
         sys.argv = ['templer', '--help']
         output = run()
-        self.assertTrue(DESCRIPTION in output,
+        comp = self.runner.texts['description'] % {'script_name': 'templer'}
+        self.assertTrue(comp in output,
                         '--help produces incorrect output: %s' % output)
 
-        # --list produces a verbose list of all templates by category
+        # the name of the given runner is interposed into the help text
+        self.runner.name = newname = 'buzbee berkeley'
+        output = run(self.runner)
+        self.assertTrue(newname in output)
+
+        sys.argv = oldargv
+
+    def test_list_verbose(self):
+        oldargv = sys.argv
+
         sys.argv = ['templer', '--list']
         output = run()
         cats = list_sorted_templates()
@@ -149,6 +161,17 @@ class test_control(unittest.TestCase):
             self.assertTrue(summary in output,
                             '%s not in --list output' % summary)
 
+        sys.argv = oldargv
+
+    def test_generate_dotfile(self):
+        """Verify that the help features of the script function correctly"""
+        oldargv = sys.argv
+
+        cats = list_sorted_templates()
+        catnames = cats.keys()
+        templates = sum(cats.values(), [])
+        tempnames = [t['name'] for t in templates]
+
         # --make-config-file produces a config file with headings for each
         # template
         sys.argv = ['templer', '--make-config-file']
@@ -157,6 +180,10 @@ class test_control(unittest.TestCase):
             self.assertTrue(theading in output,
                             '%s does not appear in .templer' % theading)
 
+        sys.argv = oldargv
+
+    def test_version(self):
+        oldargv = sys.argv
         # --version should output a version number.  make sure it finds
         # something
         sys.argv = ['templer', '--version']
