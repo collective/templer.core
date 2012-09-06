@@ -4,6 +4,9 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
+- Add AGPLv3 license
+  [iElectric]
+
 - Refactor code in the templer control script to help ease re-use by templer
   applications like ZopeSkel
   [cewing]
