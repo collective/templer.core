@@ -276,37 +276,47 @@ class Runner(object):
         create = get_commands()['create'].load()
         command = create('create')
 
-        if output_name:
-            try:
-                self._checkdots(template, output_name)
-            except ValueError, e:
-                print "ERROR: %s\n" % str(e)
-                sys.exit(1)
-        else:
-            ndots = getattr(template, 'ndots', None)
-            help = DOT_HELP.get(ndots)
-            while True:
-                if help:
-                    print help
+        # allow special runner processing to be bypassed in case of certain
+        # standard paster args
+        short_circuit = False
+        special_args = []
+        if '--list-variables' in argv:
+            special_args.append('--list-variables')
+            short_circuit = True
+            output_name = None
+        
+        if not short_circuit:
+            if output_name:
                 try:
-                    challenge = "Enter project name (or q to quit)"
-                    output_name = command.challenge(challenge)
-                    if output_name == 'q':
-                        print "\n\nExiting...\n"
-                        sys.exit(0)
                     self._checkdots(template, output_name)
                 except ValueError, e:
-                    print "\nERROR: %s" % e
-                else:
-                    break
+                    print "ERROR: %s\n" % str(e)
+                    sys.exit(1)
+            else:
+                ndots = getattr(template, 'ndots', None)
+                help = DOT_HELP.get(ndots)
+                while True:
+                    if help:
+                        print help
+                    try:
+                        challenge = "Enter project name (or q to quit)"
+                        output_name = command.challenge(challenge)
+                        if output_name == 'q':
+                            print "\n\nExiting...\n"
+                            sys.exit(0)
+                        self._checkdots(template, output_name)
+                    except ValueError, e:
+                        print "\nERROR: %s" % e
+                    else:
+                        break
 
-        print self.texts['help_prompt']
+            print self.texts['help_prompt']
 
         optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
         if output_name is not None:
             optslist.insert(0, output_name)
         try:
-            command.run(['-q', '-t', template_name] + optslist)
+            command.run(['-q', '-t', template_name] + optslist + special_args)
         except KeyboardInterrupt:
             print "\n\nExiting...\n"
             sys.exit(0)
