@@ -32,7 +32,7 @@ class IVar:
 
     page = ""
 
-    structures
+    structures = []
 
     def full_description():
         """Returns variable name and description."""

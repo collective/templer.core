@@ -3,16 +3,15 @@ import pkg_resources
 from cStringIO import StringIO
 from textwrap import TextWrapper
 
-from paste.script.command import get_commands
-
 from templer.core.base import wrap_help_paras
+from templer.core.create import CreateDistroCommand
 from templer.core.ui import list_sorted_templates
 
 
 def get_templer_packages():
     """return a list of the templer namespace packages currently installed"""
-    templer_packages = [k for k in pkg_resources.working_set.by_key.keys()\
-        if 'templer' in k.lower()]
+    templer_packages = [k for k in pkg_resources.working_set.by_key.keys()
+                        if 'templer' in k.lower()]
 
     return templer_packages
 
@@ -273,8 +272,7 @@ class Runner(object):
         if help:
             print template.help
 
-        create = get_commands()['create'].load()
-        command = create('create')
+        command = CreateDistroCommand()
 
         # allow special runner processing to be bypassed in case of certain
         # standard paster args

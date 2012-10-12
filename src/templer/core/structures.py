@@ -1,7 +1,7 @@
 import sys
 import os
 
-from paste.script import copydir
+from templer.core import copydir
 
 
 class Structure(object):

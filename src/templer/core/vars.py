@@ -1,5 +1,5 @@
 import sys
-from paste.script.templates import var as base_var
+from templer.core.create import NoDefault
 
 
 ##########################################################################
@@ -14,12 +14,12 @@ ALL = 'all'
 ##########################################################################
 # Variable classes
 
+
 class ValidationException(ValueError):
     """Invalid value provided for variable."""
 
 
-class var(base_var):
-
+class var(object):
     _default_widget = 'string'
     _is_structural = False
 
@@ -48,6 +48,11 @@ class var(base_var):
                 raise ValueError('structures must be a dictionary')
             self.structures = structures
 
+    def __repr__(self):
+        return '<%s %s default=%r should_echo=%s>' % (
+            self.__class__.__name__,
+            self.name, self.default, self.should_echo)
+
     def pretty_description(self):
         title = getattr(self, 'title', self.name) or self.name
 
@@ -65,6 +70,30 @@ class var(base_var):
 
     def validate(self, value):
         raise NotImplementedError
+
+    def full_description(self):
+        if self.description:
+            return '%s (%s)' % (self.name, self.description)
+        else:
+            return self.name
+
+    @classmethod
+    def print_vars(cls, vars, indent=0):
+        max_name = max([len(v.name) for v in vars])
+        for var in vars:
+            if var.description:
+                print '%s%s%s  %s' % (
+                    ' ' * indent,
+                    var.name,
+                    ' ' * (max_name - len(var.name)),
+                    var.description)
+            else:
+                print '  %s' % var.name
+            if var.default is not NoDefault:
+                print '      default: %r' % var.default
+            if var.should_echo is True:
+                print '      should_echo: %s' % var.should_echo
+        print
 
     @property
     def _is_structural(self):
