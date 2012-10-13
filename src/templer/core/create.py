@@ -1,16 +1,16 @@
 # (c) 2005 Ian Bicking and contributors; written for Paste (http://pythonpaste.org)
 # Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
 
+import ConfigParser
+import difflib
 import fnmatch
+import getpass
 import os
 import pkg_resources
 import re
+import subprocess
 import sys
 import textwrap
-import ConfigParser
-import getpass
-import subprocess
-import difflib
 
 from templer.core import bool_optparse
 from templer.core import copydir
@@ -68,13 +68,6 @@ class Command(object):
     # This is the default interactive state:
     default_interactive = 0
     return_code = 0
-
-    BadCommand = BadCommand
-
-    # Must define:
-    #   parser
-    #   summary
-    #   command()
 
     def run(self, args):
         self.parse_args(args)
@@ -219,14 +212,14 @@ class Command(object):
                     continue
             else:
                 return response
-        
+
     def pad(self, s, length, dir='left'):
         if len(s) >= length:
             return s
         if dir == 'left':
-            return s + ' '*(length-len(s))
+            return s + ' ' * (length - len(s))
         else:
-            return ' '*(length-len(s)) + s
+            return ' ' * (length - len(s)) + s
 
     def standard_parser(cls, verbose=True,
                         interactive=False,
@@ -236,7 +229,7 @@ class Command(object):
                         overwrite=False):
         """
         Create a standard ``OptionParser`` instance.
-        
+
         Typically used like::
 
             class MyCommand(Command):
@@ -316,8 +309,8 @@ class Command(object):
                 print 'Creating %s' % self.shorten(dir)
             if not self.simulate:
                 os.mkdir(dir)
-            if (svn_add and
-                os.path.exists(os.path.join(os.path.dirname(dir), '.svn'))):
+            if (svn_add and os.path.exists(
+                    os.path.join(os.path.dirname(dir), '.svn'))):
                 self.svn_command('add', dir)
         else:
             if self.verbose > 1:
@@ -371,7 +364,7 @@ class Command(object):
                     print 'Unknown response; Y or N please'
             else:
                 return
-                    
+
         if self.verbose:
             print 'Overwriting %s with new content' % filename
         if not self.simulate:
@@ -401,7 +394,7 @@ class Command(object):
                 print 'Would (if not simulating) insert text into %s' % (
                     self.shorten(filename))
             return
-                
+
         f = open(filename)
         lines = f.readlines()
         f.close()
@@ -411,23 +404,23 @@ class Command(object):
             if regex.search(lines[i]):
                 # Found it!
                 if (lines[i:] and len(lines[i:]) > 1 and
-                    ''.join(lines[i+1:]).strip().startswith(text.strip())):
+                    ''.join(lines[i + 1:]).strip().startswith(text.strip())):
                     # Already have it!
                     print 'Warning: line already found in %s (not inserting' % filename
                     print '  %s' % lines[i]
                     return
-                
+
                 if indent:
                     text = text.lstrip()
                     match = re.search(r'^[ \t]*', lines[i])
                     text = match.group(0) + text
-                lines[i+1:i+1] = [text]
+                lines[i + 1:i + 1] = [text]
                 break
         else:
             errstr = (
                 "Marker '-*- %s -*-' not found in %s"
                 % (marker_name, filename))
-            if 1 or self.simulate: # @@: being permissive right now
+            if 1 or self.simulate:  # @@: being permissive right now
                 print 'Warning: %s' % errstr
             else:
                 raise ValueError(errstr)
@@ -442,14 +435,14 @@ class Command(object):
         """
         Runs the command, respecting verbosity and simulation.
         Returns stdout, or None if simulating.
-        
+
         Keyword arguments:
-        
-        cwd: 
+
+        cwd:
             the current working directory to run the command in
-        capture_stderr: 
+        capture_stderr:
             if true, then both stdout and stderr will be returned
-        expect_returncode: 
+        expect_returncode:
             if true, then don't fail if the return code is not 0
         force_no_simulate:
             if true, run the command even if --simulate
@@ -517,7 +510,7 @@ class Command(object):
         spaces, it just leaves well enough alone.
         """
         if (sys.platform != 'win32'
-            or ' ' not in arg):
+                or ' ' not in arg):
             # Problem does not apply:
             return arg
         try:
@@ -601,7 +594,7 @@ class Command(object):
             name, value = arg.split('=', 1)
             result[name] = value
         return result
-    
+
     def read_vars(self, config, section='pastescript'):
         """
         Given a configuration filename, this will return a map of values.
@@ -639,7 +632,7 @@ class Command(object):
         existing_options = p.options(section)
         for key, value in vars.items():
             if (key not in existing_options and
-                '%s__eval__' % key not in existing_options):
+                    '%s__eval__' % key not in existing_options):
                 if not isinstance(value, str):
                     p.set(section, '%s__eval__' % key, repr(value))
                 else:
@@ -648,7 +641,7 @@ class Command(object):
 
         if modified:
             p.write(open(config, 'w'))
-        
+
     def indent_block(self, text, indent=2, initial=None):
         """
         Indent the block of text (each line is indented).  If you give
@@ -659,7 +652,7 @@ class Command(object):
             initial = indent
         lines = text.splitlines()
         first = (' ' * initial) + lines[0]
-        rest = [(' ' * indent)+l for l in lines[1:]]
+        rest = [(' ' * indent) + l for l in lines[1:]]
         return '\n'.join([first] + rest)
 
 
@@ -743,7 +736,7 @@ class CreateDistroCommand(Command):
 
         templates = [tmpl for name, tmpl in templates]
         output_dir = os.path.join(self.options.output_dir, dist_name)
-        
+ 
         pkg_name = self._bad_chars_re.sub('', dist_name.lower())
         vars = {'project': dist_name,
                 'package': pkg_name,
@@ -753,8 +746,8 @@ class CreateDistroCommand(Command):
         if self.options.config and os.path.exists(self.options.config):
             for key, value in self.read_vars(self.options.config).items():
                 vars.setdefault(key, value)
-        
-        if self.verbose: # @@: > 1?
+
+        if self.verbose:  # @@: > 1?
             self.display_vars(vars)
 
         if self.options.inspect_files:
@@ -765,7 +758,7 @@ class CreateDistroCommand(Command):
             # We want to avoid asking questions in copydir if the path
             # doesn't exist yet
             copydir.all_answer = 'y'
-        
+
         if self.options.svn_repository:
             self.setup_svn_repository(output_dir, dist_name)
 
@@ -783,7 +776,7 @@ class CreateDistroCommand(Command):
         egg_plugins = list(egg_plugins)
         egg_plugins.sort()
         vars['egg_plugins'] = egg_plugins
-            
+
         for template in templates:
             self.create_template(
                 template, output_dir, vars)
