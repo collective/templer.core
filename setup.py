@@ -73,6 +73,7 @@ setup(name='templer.core',
         [paste.paster_create_template]
         basic_namespace = templer.core:BasicNamespace
         nested_namespace = templer.core:NestedNamespace
+        package = templer.core:PackageTemplate
 
         [templer.templer_structure]
         egg_docs = templer.core.structures:EggDocsStructure
