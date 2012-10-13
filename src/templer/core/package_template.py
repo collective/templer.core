@@ -19,7 +19,6 @@ LICENSE_DICT = dict(zip(lower_licenses, lower_licenses))
 class PackageTemplate(BaseTemplate):
     _template_dir = 'templates/basic_namespace'
     summary = "A Python package template for templer"
-    ndots = 1
     help = """
 This creates a Python project without any Zope or Plone features.
 """
@@ -29,45 +28,22 @@ This creates a Python project without any Zope or Plone features.
     default_required_structures = ['egg_docs', ]
     use_cheetah = True
 
-    def run(self, command, output_dir, vars):
-        templates.Template.run(self, command, output_dir, vars)
 
     vars = copy.deepcopy(BaseTemplate.vars)
     vars += [
         DottedVar(
-            'namespace_package',
-            title='Namespace Package Name',
-            description='Name of outer namespace package',
-            default='my',
-            modes=(EXPERT, ),
+            'egg',
+            title='Package',
+            description='Package name (for namespace support use dots.)',
+            default='',
+            modes=(EASY, ),
             page='Namespaces',
             help="""
-This is the name of the outer package (Python folder) for this project.
-For example, in 'Products.PloneFormGen', this would be 'Products'.
-This will often be (for Plone products) 'Products'; it may also be
-the name of your company/project, or a common-style name like
-(for Plone products) 'collective'.
+Choose the name of your package.
 
-Note that, for some templates, there may be two namespaces, rather
-than one (to create eggs with names like 'plone.app.blog')--in this
-case, this would be 'plone', the first of the enclosing namespaces.
+If you want to use dots in the package name (namespaces), just provide them
+directly in the name. For example: my.package.
             """),
-
-        DottedVar(
-            'package',
-            title='Package Name',
-            description='Name of the inner namespace package',
-            default='example',
-            modes=(EXPERT, ),
-            page='Namespaces',
-            help="""
-This is the name of the innermost package (Python folder) for this project.
-For example, in 'Products.PloneFormGen', this would be 'PloneFormGen'.
-
-Note that, for some templates, there may be only a package name without
-a namespace package around it--in this case, this would be just the name
-of the package.
-"""),
 
         StringVar(
             'version',
@@ -217,6 +193,8 @@ the safest answer is False.
 
         super(PackageTemplate, self).pre(command, output_dir, vars)
 
+    def run(self, command, output_dir, vars):
+        templates.Template.run(self, command, output_dir, vars)
 
     def check_vars(self, vars, command):
         if not command.options.no_interactive and \
