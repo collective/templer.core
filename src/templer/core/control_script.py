@@ -496,23 +496,11 @@ class Runner(object):
         validates that the provided project name has the expected number of
         namespaces and that each part is a legal Python identifier.
         """
-        return
-        ndots = getattr(template, 'ndots', None)
-        if ndots is None:
-            return   # No validation possible
 
         cdots = name.count(".")
-        if ndots != cdots:
-            raise ValueError(
-                "Project name expected %i dots, supplied '%s' has %i dots" % (
-                    ndots, name, cdots))
-        for part in name.split("."):
-            # Check if Python identifier,
-            # http://code.activestate.com/recipes/413487/
-            try:
-                class test(object): __slots__ = [part]
-            except TypeError:
-                raise ValueError(self.texts['id_warning'] % (name, part))
+        if cdots > 5:
+            raise ValueError("Five dots should be more than enough, "
+                             "no black hole please")
 
 
 templer_runner = Runner()
