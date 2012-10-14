@@ -180,17 +180,10 @@ the safest answer is False.
         ]
 
     def pre(self, command, output_dir, vars):
-#        egg_var = get_var(vars, 'egg')
-#        egg_var = str(egg_var)
-#        vars['segs']
-#        egg_var.split('.')
-#        namespace = []
-#
-#        for i in range(len(vars['segs']) - 1):
-#            namespace.append(".".join(vars['segs'][0:i+1]))
-#
-#        vars['namespace'] = namespace
-        
+        """The namespace string for insertion into setup.py needs to
+           be calculated, and inserted into the vars for use in
+           setup.py_tmpl.
+        """
         if '.' in vars['egg']:
             # Taken from http://code.google.com/p/wsgitemplates/
             namespace = []
