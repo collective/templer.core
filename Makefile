@@ -27,10 +27,10 @@ flake8:	bin/flake8
 	bin/flake8 --max-complexity 12 src/templer/core
 
 pep8:	bin/pep8
-	bin/pep8 tooth/paste
+	bin/pep8 src/templer/core
 
 pyflakes:	bin/pyflakes
-	bin/pyflakes tooth/paste
+	bin/pyflakes src/templer/core
 
 templer: bin/python
 	# Hack to make believe templer that the current folder is the home folder
@@ -42,7 +42,7 @@ diff: bin/python
 	colordiff -c -r templer.core .|less -r
 
 sloccount:	bin/python
-	sloccount tooth/paste
+	sloccount src/templer/core
 
 dryrelease:	bin/mkrelease
 	bin/mkrelease --no-commit --no-tag --dry-run -d pypi
