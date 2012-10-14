@@ -1,3 +1,4 @@
+import os
 import copy
 
 from paste.script import templates
@@ -17,7 +18,8 @@ LICENSE_DICT = dict(zip(lower_licenses, lower_licenses))
 
 
 class PackageTemplate(BaseTemplate):
-    _template_dir = 'templates/outer'
+    _outer_template_dir = 'templates/outer'
+    _inner_template_dir = 'templates/inner'
     summary = "A Python package template for templer"
     help = """
 This creates a Python project without any Zope or Plone features.
@@ -195,8 +197,36 @@ the safest answer is False.
 
         super(PackageTemplate, self).pre(command, output_dir, vars)
 
+
+    def post(self, command, output_dir, vars):
+        cwd = os.getcwd()
+        os.chdir(vars['egg'])
+        os.chdir('src')
+        for i in range(len(vars['egg'].split('.'))):
+            segs = vars['egg'].split('.')[0:i+1]
+            try:
+                os.mkdir(os.path.join(*vars['egg'].split('.')[0:i+1]))
+            except OSError:
+                pass
+            segs.append("__init__.py")
+            init = open(os.path.join(*segs), "w")
+            if i == len(vars['egg'].split('.'))-1:
+                segs[-1] = "README.txt"
+                open(os.path.join(*segs), "w").close()
+            else:
+                init.write("__import__('pkg_resources').declare_namespace(__name__)")
+            init.close()
+        os.chdir(cwd)
+        super(PackageTemplate, self).post(command, output_dir, vars)
+
+
     def run(self, command, output_dir, vars):
+        self._template_dir = self._outer_template_dir
         templates.Template.run(self, command, output_dir, vars)
+        inner_output_dir = os.path.join(*([vars['egg'], 'src'] + vars['egg'].split('.')))
+        self._template_dir = self._inner_template_dir
+        templates.Template.run(self, command, output_dir, vars)
+
 
     def check_vars(self, vars, command):
         if not command.options.no_interactive and \
