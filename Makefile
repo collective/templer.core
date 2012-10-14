@@ -13,7 +13,7 @@ build:
 	virtualenv $(VTENV_OPTS) .
 	bin/python setup.py develop
 
-test: bin/nosetests
+test: bin/nosetests bin/unittest2
 	bin/nosetests -s src/templer/core
 
 coverage: bin/coverage bin/nosetests
@@ -74,3 +74,6 @@ bin/pep8: bin/python
 
 bin/mkrelease: bin/python
 	bin/pip install jarn.mkrelease
+
+bin/unittest2: bin/python
+	bin/pip install unittest2
