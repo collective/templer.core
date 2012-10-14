@@ -35,7 +35,7 @@ pyflakes:	bin/pyflakes
 templer: bin/python
 	# Hack to make believe templer that the current folder is the home folder
 	# so that it reads the local .zopeskel file with the defaults
-	export OLDHOME="${HOME}"; export HOME="${PWD}"; ./bin/templer dotpackage templer.core; export HOME="${OLDHOME}"
+	export OLDHOME="${HOME}"; export HOME="${PWD}"; ./bin/templer package templer.core; export HOME="${OLDHOME}"
 
 diff: bin/python
 	# Show the difference between the current package and the regenerated one
