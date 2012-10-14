@@ -224,6 +224,7 @@ the safest answer is False.
         templates.Template.run(self, command, output_dir, vars)
         output_dir = os.path.join(*([vars['egg'], 'src'] + vars['egg'].split('.')))
         self._template_dir = self._inner_template_dir
+        self.required_structures=[]
         templates.Template.run(self, command, output_dir, vars)
 
 
