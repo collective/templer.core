@@ -17,7 +17,7 @@ LICENSE_DICT = dict(zip(lower_licenses, lower_licenses))
 
 
 class PackageTemplate(BaseTemplate):
-    _template_dir = 'templates/basic_namespace'
+    _template_dir = 'templates/outer'
     summary = "A Python package template for templer"
     help = """
 This creates a Python project without any Zope or Plone features.
@@ -190,6 +190,15 @@ the safest answer is False.
 #            namespace.append(".".join(vars['segs'][0:i+1]))
 #
 #        vars['namespace'] = namespace
+        
+        if '.' in vars['egg']:
+            # Taken from http://code.google.com/p/wsgitemplates/
+            namespace = []
+            for i in range(len(vars['egg'].split('.')) - 1):
+                namespace.append(".".join(vars['egg'].split('.')[0:i+1]))
+            vars['namespace'] = "\n      namespace_packages=%s," % namespace
+        else:
+           vars['namespace'] = ""
 
         super(PackageTemplate, self).pre(command, output_dir, vars)
 
