@@ -209,30 +209,24 @@ the safest answer is False.
             except OSError:
                 pass
             segs.append("__init__.py")
-            init = open(os.path.join(*segs), "w")
-            if i == len(vars['egg'].split('.'))-1:
-                segs[-1] = "README.txt"
-                open(os.path.join(*segs), "w").close()
-            else:
+            init = None
+            if i != len(vars['egg'].split('.'))-1:
+                init = open(os.path.join(*segs), "w")
                 init.write("__import__('pkg_resources').declare_namespace(__name__)")
-            init.close()
+            if not init is None:
+                init.close()
         os.chdir(cwd)
         super(PackageTemplate, self).post(command, output_dir, vars)
 
 
     def run(self, command, output_dir, vars):
-        self.outer(command, output_dir, vars)
-        self.inner(command, output_dir, vars)
-
-    def outer(self, command, output_dir, vars):
         self._template_dir = self._outer_template_dir
         templates.Template.run(self, command, output_dir, vars)
-
-    def inner(self, command, output_dir, vars):        
-        self._template_dir = self._inner_template_dir
         output_dir = os.path.join(*([vars['egg'], 'src'] + vars['egg'].split('.')))
+        self._template_dir = self._inner_template_dir
         templates.Template.run(self, command, output_dir, vars)
-    
+
+
     def check_vars(self, vars, command):
         if not command.options.no_interactive and \
            not hasattr(command, '_deleted_once'):
