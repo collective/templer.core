@@ -221,13 +221,18 @@ the safest answer is False.
 
 
     def run(self, command, output_dir, vars):
+        self.outer(command, output_dir, vars)
+        self.inner(command, output_dir, vars)
+
+    def outer(self, command, output_dir, vars):
         self._template_dir = self._outer_template_dir
         templates.Template.run(self, command, output_dir, vars)
-        inner_output_dir = os.path.join(*([vars['egg'], 'src'] + vars['egg'].split('.')))
+
+    def inner(self, command, output_dir, vars):        
         self._template_dir = self._inner_template_dir
+        output_dir = os.path.join(*([vars['egg'], 'src'] + vars['egg'].split('.')))
         templates.Template.run(self, command, output_dir, vars)
-
-
+    
     def check_vars(self, vars, command):
         if not command.options.no_interactive and \
            not hasattr(command, '_deleted_once'):
