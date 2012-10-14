@@ -63,9 +63,23 @@ class TestPackageTemplate(unittest.TestCase):
                 package = ep.name
         self.failIf(package is None)
 
-    def test_template_pre(self):
+    def test_template_pre_package(self):
+        """Make sure no namespace is inserted"""
         new_template = PackageTemplate('joe')
-        new_template.pre(self.command, self.temp_dir, self.vars)
+        vars = {'egg' : 'exampleproject'}
+        new_template.pre(self.command, self.temp_dir, vars)
+        self.failUnless(vars['namespace'] == "")
 
+    def test_template_pre_dot_package(self):
+        """Make sure the namespace line is inserted"""
+        new_template = PackageTemplate('joe')
+        vars = {'egg' : 'example.project'}
+        new_template.pre(self.command, self.temp_dir, vars)
+        self.failUnless(vars['namespace'] == "\n      namespace_packages=['example'],", vars['namespace'])
 
-
+    def test_template_pre_dotdot_package(self):
+        """Make sure the namespace line is inserted"""
+        new_template = PackageTemplate('joe')
+        vars = {'egg' : 'example.dotdot.project'}
+        new_template.pre(self.command, self.temp_dir, vars)
+        self.failUnless(vars['namespace'] == "\n      namespace_packages=['example', 'example.dotdot'],", vars['namespace'])
