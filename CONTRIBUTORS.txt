@@ -1,6 +1,8 @@
 - Cris Ewing, original author
 - Lazaro Clapp
 - Hector Velarde
+- Jan Murre
+- Maik Röder
 
 Based on code from zopeskel, contributors to which include:
 
