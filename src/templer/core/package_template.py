@@ -193,10 +193,9 @@ the safest answer is False.
                 namespace.append(".".join(vars['egg'].split('.')[0:i+1]))
             vars['namespace'] = "\n      namespace_packages=%s," % namespace
         else:
-           vars['namespace'] = ""
+            vars['namespace'] = ""
 
         super(PackageTemplate, self).pre(command, output_dir, vars)
-
 
     def post(self, command, output_dir, vars):
         cwd = os.getcwd()
@@ -212,24 +211,24 @@ the safest answer is False.
             init = None
             if i != len(vars['egg'].split('.'))-1:
                 init = open(os.path.join(*segs), "w")
-                init.write("__import__('pkg_resources').declare_namespace(__name__)")
+                bit = "__import__('pkg_resources').declare_namespace(__name__)"
+                init.write(bit)
             if not init is None:
                 init.close()
         os.chdir(cwd)
         super(PackageTemplate, self).post(command, output_dir, vars)
 
-
     def run(self, command, output_dir, vars):
         self._template_dir = self._outer_template_dir
         templates.Template.run(self, command, output_dir, vars)
-        output_dir = os.path.join(*([vars['egg'], 'src'] + vars['egg'].split('.')))
+        output_dir = os.path.join(
+            *([vars['egg'], 'src'] + vars['egg'].split('.')))
 
         self._template_dir = self._inner_template_dir
         _old_required_structures=self.required_structures
         self.required_structures=[]
         templates.Template.run(self, command, output_dir, vars)
         self.required_structures = _old_required_structures
-
 
     def check_vars(self, vars, command):
         if not command.options.no_interactive and \
