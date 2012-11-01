@@ -121,7 +121,9 @@ class StringChoiceVar(var):
     def validate(self, value):
         value = value.strip().lower()
         if not value in self.choices:
-            raise ValidationException("Not a valid value: %s" % value)
+            msg = "Not a valid value: %s\n Allowed values are %s"
+            allowed = ", ".join(self.choices)
+            raise ValidationException(msg % (value, allowed))
 
         return value
 
