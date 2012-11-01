@@ -114,20 +114,20 @@ def clean_working_set():
     sys.path = ws.entries[:]
 
 
-def testSetUp(test):
+def _testSetUp(test):
     test.orig_dir = os.getcwd()
     test.temp_dir = tempfile.mkdtemp()
     cd(test.temp_dir)
 
 
-def testTearDown(test):
+def _testTearDown(test):
     cd(test.orig_dir)
     shutil.rmtree(test.temp_dir, ignore_errors=True)
     test.temp_dir = None
     clean_working_set()
 
 
-def doc_suite(test_dir, setUp=testSetUp, tearDown=testTearDown, globs=None):
+def doc_suite(test_dir, setUp=_testSetUp, tearDown=_testTearDown, globs=None):
     """Returns a test suite, based on doctests found in /docs."""
     suite = []
     if globs is None:

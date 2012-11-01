@@ -48,21 +48,6 @@ class test_control(unittest.TestCase):
         except ValueError:
             self.fail('checkdots should not have failed with no ndots')
 
-    def test_checkdots_two(self):
-        """Verify that checkdots validates templates with ndots hint."""
-
-        self.template.ndots = 2
-
-        for bad in ["nodots", "one.dot", "three.dots.in.this",
-                    "two.dots.but not legal"]:
-            self.assertRaises(ValueError, self.runner._checkdots,
-                              self.template, bad)
-
-        try:
-            self.runner._checkdots(self.template, "two.dots.legal")
-        except ValueError:
-            self.fail('checkdots should not have failed')
-
     def test_process_args(self):
         """Ensure process_args correctly processes command-line arguments"""
         argv = []
@@ -109,21 +94,21 @@ class test_control(unittest.TestCase):
         argv = argv[:2] + ['bob', 'kate']
         self.assertRaises(SyntaxError, self.runner._process_args, argv[:])
 
-    
+
     def test_script_errors(self):
         """Verify that the run method catches errors correctly"""
         oldargv = sys.argv
-    
+
         # non-existent templates are not caught until in 'run'
         sys.argv = ['templer', 'no-template', 'my.package']
         output = run()
         self.assertTrue('ERROR: No such template' in output)
-    
+
         # calling the script with no arguments at all prints usage
         sys.argv = sys.argv[:1]
         output = run()
         self.assertTrue('Usage:' in output)
-    
+
         sys.argv = oldargv
 
     def test_show_help(self):

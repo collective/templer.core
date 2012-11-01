@@ -2,6 +2,8 @@
 - Lazaro Clapp
 - Hector Velarde
 - Domen Kožar
+- Jan Murre
+- Maik Röder
 
 Based on code from zopeskel, contributors to which include:
 

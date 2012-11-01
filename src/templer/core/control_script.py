@@ -145,8 +145,8 @@ Differences from the 'paster create' command
 --------------------------------------------
 
 1) The --svn-repository argument that can be provided to 'paster create' is
-   not allowed when using the %(script_name)s script.  It will raise an error.  
-   The reasons for this are discussed at length in the zopeskel mailing list 
+   not allowed when using the %(script_name)s script.  It will raise an error.
+   The reasons for this are discussed at length in the zopeskel mailing list
    and in the zopeskel issue tracker:
    http://plone.org/products/zopeskel/issues/34
    http://plone.org/products/zopeskel/issues/35
@@ -256,6 +256,7 @@ class Runner(object):
             self.usage(exit=False)
             msg = "ERROR: There was a problem with your arguments: %s\n"
             print msg % str(e)
+            raise
             sys.exit(1)
 
         rez = pkg_resources.iter_entry_points(
@@ -284,13 +285,14 @@ class Runner(object):
             special_args.append('--list-variables')
             short_circuit = True
             output_name = None
-        
+
         if not short_circuit:
             if output_name:
                 try:
                     self._checkdots(template, output_name)
                 except ValueError, e:
                     print "ERROR: %s\n" % str(e)
+                    raise
                     sys.exit(1)
             else:
                 ndots = getattr(template, 'ndots', None)
@@ -307,6 +309,7 @@ class Runner(object):
                         self._checkdots(template, output_name)
                     except ValueError, e:
                         print "\nERROR: %s" % e
+                        raise
                     else:
                         break
 
@@ -322,6 +325,7 @@ class Runner(object):
             sys.exit(0)
         except Exception, e:
             print "\nERROR: %s\n" % str(e)
+            raise
             sys.exit(1)
         sys.exit(0)
 
@@ -492,22 +496,11 @@ class Runner(object):
         validates that the provided project name has the expected number of
         namespaces and that each part is a legal Python identifier.
         """
-        ndots = getattr(template, 'ndots', None)
-        if ndots is None:
-            return   # No validation possible
 
         cdots = name.count(".")
-        if ndots != cdots:
-            raise ValueError(
-                "Project name expected %i dots, supplied '%s' has %i dots" % (
-                    ndots, name, cdots))
-        for part in name.split("."):
-            # Check if Python identifier,
-            # http://code.activestate.com/recipes/413487/
-            try:
-                class test(object): __slots__ = [part]
-            except TypeError:
-                raise ValueError(self.texts['id_warning'] % (name, part))
+        if cdots > 5:
+            raise ValueError("Five dots should be more than enough, "
+                             "no black hole please")
 
 
 templer_runner = Runner()
