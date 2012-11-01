@@ -13,6 +13,7 @@ from templer.core.base import BaseTemplate
 from templer.core.base import LICENSE_CATEGORIES
 
 LICENSE_EXPECTATIONS = {
+    'agpl3': ['LICENSE.txt', ],
     'asl': ['NOTICE.txt', 'LICENSE.ASL'],
     'bsd': ['LICENSE.txt', ],
     'efl': ['LICENSE.txt', 'LICENSE.EFL'],
