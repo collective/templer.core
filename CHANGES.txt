@@ -4,6 +4,10 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
+- Don't run the setuptools egg_info command as part of running a template.
+  This avoids installing package dependencies in ways that can be problematic.
+  [davisagli]
+
 - Refactor code in the templer control script to help ease re-use by templer
   applications like ZopeSkel
   [cewing]
