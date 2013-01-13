@@ -7,6 +7,12 @@ from templer.core.base import wrap_help_paras
 from templer.core.create import CreateDistroCommand
 from templer.core.ui import list_sorted_templates
 
+try:
+    from templer.localcommands.command import TemplerLocalCommand
+    HAS_LOCAL_COMMANDS = True
+except ImportError:
+    HAS_LOCAL_COMMANDS = False
+
 
 def get_templer_packages():
     """return a list of the templer namespace packages currently installed"""
@@ -513,6 +519,15 @@ templer_runner = Runner()
 
 def run(runner=templer_runner):
 
+    if len(sys.argv) == 1:
+        runner.usage()
+
+    # Relay the 'add' command to templer.localcommands
+    if HAS_LOCAL_COMMANDS and sys.argv[1] == 'add':
+        runner = TemplerLocalCommand('add')
+        runner.run(sys.argv[2:])
+        return
+
     if "--help" in sys.argv:
         runner.show_help()
 
@@ -524,9 +539,6 @@ def run(runner=templer_runner):
 
     if "--version" in sys.argv:
         runner.show_version()
-
-    if len(sys.argv) == 1:
-        runner.usage()
 
     args = sys.argv[1:]
     runner(args)
