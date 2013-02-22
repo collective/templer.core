@@ -6,7 +6,6 @@ import inspect
 import os
 import pkg_resources
 import string
-import subprocess
 import urllib
 
 import Cheetah.Template
@@ -28,7 +27,6 @@ def copy_dir(source,
              use_cheetah=False,
              sub_vars=True,
              interactive=False,
-             svn_add=True,
              overwrite=True,
              template_renderer=None):
     """
@@ -48,9 +46,6 @@ def copy_dir(source,
     ``use_cheetah``: If true, then any templates encountered will be
     substituted with Cheetah.  Otherwise ``template_renderer`` or
     ``string.Template`` will be used for templates.
-
-    ``svn_add``: If true, any files written out in directories with
-    ``.svn/`` directories will be added (via ``svn add``).
 
     ``overwrite``: If false, then don't every overwrite anything.
 
@@ -79,8 +74,7 @@ def copy_dir(source,
         if verbosity >= 1:
             print '%sCreating %s/' % (pad, dest)
         if not simulate:
-            svn_makedirs(dest, svn_add=svn_add, verbosity=verbosity,
-                         pad=pad)
+            makedirs(dest, verbosity=verbosity, pad=pad)
     elif verbosity >= 2:
         print '%sDirectory %s exists' % (pad, dest)
 
@@ -107,7 +101,7 @@ def copy_dir(source,
             copy_dir((source[0], full), dest_full, vars, verbosity, simulate,
                      indent=indent + 1, use_cheetah=use_cheetah,
                      sub_vars=sub_vars, interactive=interactive,
-                     svn_add=svn_add, template_renderer=template_renderer)
+                     template_renderer=template_renderer)
             continue
         elif not use_pkg_resources and os.path.isdir(full):
             if verbosity:
@@ -115,7 +109,7 @@ def copy_dir(source,
             copy_dir(full, dest_full, vars, verbosity, simulate,
                      indent=indent + 1, use_cheetah=use_cheetah,
                      sub_vars=sub_vars, interactive=interactive,
-                     svn_add=svn_add, template_renderer=template_renderer)
+                     template_renderer=template_renderer)
             continue
         elif use_pkg_resources:
             content = pkg_resources.resource_string(source[0], full)
@@ -156,27 +150,6 @@ def copy_dir(source,
             f = open(dest_full, 'wb')
             f.write(content)
             f.close()
-        if svn_add and not already_exists:
-            if not os.path.exists(os.path.join(os.path.dirname(os.path.abspath(dest_full)), '.svn')):
-                if verbosity > 1:
-                    print '%s.svn/ does not exist; cannot add file' % pad
-            else:
-                cmd = ['svn', 'add', dest_full]
-                if verbosity > 1:
-                    print '%sRunning: %s' % (pad, ' '.join(cmd))
-                if not simulate:
-                    # @@: Should
-                    if subprocess is None:
-                        raise RuntimeError('copydir failed, environment '
-                                           'does not support subprocess '
-                                           'module')
-                    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-                    stdout, stderr = proc.communicate()
-                    if verbosity > 1 and stdout:
-                        print 'Script output:'
-                        print stdout
-        elif svn_add and already_exists and verbosity > 1:
-            print '%sFile already exists (not doing svn add)' % pad
 
 
 def should_skip_file(name):
@@ -273,25 +246,11 @@ Responses:
 """
 
 
-def svn_makedirs(dir, svn_add, verbosity, pad):
+def makedirs(dir, verbosity, pad):
     parent = os.path.dirname(os.path.abspath(dir))
     if not os.path.exists(parent):
-        svn_makedirs(parent, svn_add, verbosity, pad)
+        makedirs(parent, verbosity, pad)
     os.mkdir(dir)
-    if not svn_add:
-        return
-    if not os.path.exists(os.path.join(parent, '.svn')):
-        if verbosity > 1:
-            print '%s.svn/ does not exist; cannot add directory' % pad
-        return
-    cmd = ['svn', 'add', dir]
-    if verbosity > 1:
-        print '%sRunning: %s' % (pad, ' '.join(cmd))
-    proc = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    stdout, stderr = proc.communicate()
-    if verbosity > 1 and stdout:
-        print 'Script output:'
-        print stdout
 
 
 def substitute_filename(fn, vars):

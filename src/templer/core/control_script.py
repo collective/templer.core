@@ -37,7 +37,6 @@ Usage:
                                           packages
 
 %(templates)s
-Warning:  use of the --svn-repository argument is not allowed with this script
 
 For further help information, please invoke this script with the
 option "--help".
@@ -232,12 +231,6 @@ If at any point, you need additional help for a question, you can enter
 """
 
 
-SVN_WARNING = """
-For a number of reasons, the --svn-repository argument is not supported
-with the %s script. Try --help for more information.
-"""
-
-
 ID_WARNING = "Not a valid Python dotted name: %s ('%s' is not an identifier)"
 
 
@@ -261,7 +254,6 @@ class Runner(object):
         'dot_help': DOT_HELP,
         'dotfile_header': DOTFILE_HEADER,
         'help_prompt': HELP_PROMPT,
-        'svn_warning': SVN_WARNING,
         'id_warning': ID_WARNING,
         'not_here_warning': NOT_HERE_WARNING,
     }
@@ -534,21 +526,6 @@ class Runner(object):
                 output_name = arg
             elif eq_index > 0:
                 key, val = arg.split('=')
-                # the --svn-repository argument to paster does some things that
-                # cause it to be pretty much incompatible with zopeskel. See
-                # the following zopeskel issues:
-                #     http://plone.org/products/zopeskel/issues/35
-                #     http://plone.org/products/zopeskel/issues/34
-                # For this reason, we are going to disallow using the
-                # --svn-repository argument when using the zopeskel wrapper.
-                #
-                # Those who wish to use it can still do so by going back to
-                # paster, with the caveat that there are some templates
-                # (particularly the buildout ones) for which the argument will
-                # always throw errors (at least until the problems are fixed
-                # upstream in paster itself).
-                if 'svn-repository' in key:
-                    raise SyntaxError(self.texts['svn_warning'] % self.name)
                 others[key] = val
             else:
                 raise SyntaxError(arg)

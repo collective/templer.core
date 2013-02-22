@@ -287,13 +287,10 @@ class Command(object):
         else:
             return fn
 
-    def ensure_dir(self, dir, svn_add=True):
+    def ensure_dir(self, dir):
         """
         Ensure that the directory exists, creating it if necessary.
         Respects verbosity and simulation.
-
-        Adds directory to subversion if ``.svn/`` directory exists in
-        parent, and directory was created.
         """
         dir = dir.rstrip(os.sep)
         if not dir:
@@ -309,14 +306,11 @@ class Command(object):
                 print 'Creating %s' % self.shorten(dir)
             if not self.simulate:
                 os.mkdir(dir)
-            if (svn_add and os.path.exists(
-                    os.path.join(os.path.dirname(dir), '.svn'))):
-                self.svn_command('add', dir)
         else:
             if self.verbose > 1:
                 print "Directory already exists: %s" % self.shorten(dir)
 
-    def ensure_file(self, filename, content, svn_add=True):
+    def ensure_file(self, filename, content):
         """
         Ensure a file named ``filename`` exists with the given
         content.  If ``--interactive`` has been enabled, this will ask
@@ -324,7 +318,7 @@ class Command(object):
         """
         assert content is not None, (
             "You cannot pass a content of None")
-        self.ensure_dir(os.path.dirname(filename), svn_add=svn_add)
+        self.ensure_dir(os.path.dirname(filename))
         if not os.path.exists(filename):
             if self.verbose:
                 print 'Creating %s' % filename
@@ -332,9 +326,6 @@ class Command(object):
                 f = open(filename, 'wb')
                 f.write(content)
                 f.close()
-            if svn_add and os.path.exists(os.path.join(os.path.dirname(filename), '.svn')):
-                self.svn_command('add', filename,
-                                 warn_returncode=True)
             return
         f = open(filename, 'rb')
         old_content = f.read()
@@ -523,21 +514,8 @@ class Command(object):
         arg = win32api.GetShortPathName(arg)
         return arg
 
-    _svn_failed = False
-
-    def svn_command(self, *args, **kw):
-        """
-        Run an svn command, but don't raise an exception if it fails.
-        """
-        try:
-            return self.run_command('svn', *args, **kw)
-        except OSError, e:
-            if not self._svn_failed:
-                print 'Unable to run svn command (%s); proceeding anyway' % e
-                self._svn_failed = True
-
     def write_file(self, filename, content, source=None,
-                   binary=True, svn_add=True):
+                   binary=True):
         """
         Like ``ensure_file``, but without the interactivity.  Mostly
         deprecated.  (I think I forgot it existed)
@@ -575,10 +553,6 @@ class Command(object):
                 f = open(filename, 'w')
             f.write(content)
             f.close()
-            if (not already_existed
-                and svn_add
-                and os.path.exists(os.path.join(os.path.dirname(filename), '.svn'))):
-                self.svn_command('add', filename)
 
     def parse_vars(self, args):
         """
@@ -680,10 +654,6 @@ class CreateDistroCommand(Command):
                       metavar='DIR',
                       default='.',
                       help="Write put the directory into DIR (default current directory)")
-    parser.add_option('--svn-repository',
-                      dest='svn_repository',
-                      metavar='REPOS',
-                      help="Create package at given repository location (this will create the standard trunk/ tags/ branches/ hierarchy)")
     parser.add_option('--list-templates',
                       dest='list_templates',
                       action='store_true',
@@ -759,9 +729,6 @@ class CreateDistroCommand(Command):
             # doesn't exist yet
             copydir.all_answer = 'y'
 
-        if self.options.svn_repository:
-            self.setup_svn_repository(output_dir, dist_name)
-
         # First we want to make sure all the templates get a chance to
         # set their variables, all at once, with the most specialized
         # template going first (the last template is the most
@@ -785,9 +752,6 @@ class CreateDistroCommand(Command):
         if package_dir:
             output_dir = os.path.join(output_dir, package_dir)
         
-        if self.options.svn_repository:
-            self.add_svn_repository(vars, output_dir)
-
         if self.options.config:
             write_vars = vars.copy()
             del write_vars['project']
@@ -799,34 +763,6 @@ class CreateDistroCommand(Command):
             print 'Creating template %s' % template.name
         template.run(self, output_dir, vars)
 
-    def setup_svn_repository(self, output_dir, dist_name):
-        # @@: Use subprocess
-        svn_repos = self.options.svn_repository
-        svn_repos_path = os.path.join(svn_repos, dist_name).replace('\\','/')
-        svn_command = 'svn'
-        if sys.platform == 'win32':
-            svn_command += '.exe'
-        # @@: The previous method of formatting this string using \ doesn't work on Windows
-        cmd = '%(svn_command)s mkdir %(svn_repos_path)s' + \
-            ' %(svn_repos_path)s/trunk %(svn_repos_path)s/tags' + \
-            ' %(svn_repos_path)s/branches -m "New project %(dist_name)s"'
-        cmd = cmd % {
-            'svn_repos_path': svn_repos_path, 
-            'dist_name': dist_name,
-            'svn_command':svn_command,
-        }
-        if self.verbose:
-            print "Running:"
-            print cmd
-        if not self.simulate:
-            os.system(cmd)
-        svn_repos_path_trunk = os.path.join(svn_repos_path,'trunk').replace('\\','/')
-        cmd = svn_command+' co "%s" "%s"' % (svn_repos_path_trunk, output_dir)
-        if self.verbose:
-            print "Running %s" % cmd
-        if not self.simulate:
-            os.system(cmd)
-
     ignore_egg_info_files = [
         'top_level.txt',
         'entry_points.txt',
@@ -836,23 +772,6 @@ class CreateDistroCommand(Command):
         'SOURCES.txt',
         'dependency_links.txt',
         'not-zip-safe']
-
-    def add_svn_repository(self, vars, output_dir):
-        egg_info_dir = pluginlib.egg_info_dir(output_dir, vars['project'])
-        svn_command = 'svn'
-        if sys.platform == 'win32':
-            svn_command += '.exe'
-        self.run_command(svn_command, 'add', '-N', egg_info_dir)
-        paster_plugins_file = os.path.join(
-            egg_info_dir, 'paster_plugins.txt')
-        if os.path.exists(paster_plugins_file):
-            self.run_command(svn_command, 'add', paster_plugins_file)
-        self.run_command(svn_command, 'ps', 'svn:ignore',
-                         '\n'.join(self.ignore_egg_info_files),
-                         egg_info_dir)
-        if self.verbose:
-            print ("You must next run 'svn commit' to commit the "
-                   "files to repository")
 
     def extend_templates(self, templates, tmpl_name):
         if '#' in tmpl_name:
