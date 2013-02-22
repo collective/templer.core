@@ -4,8 +4,8 @@ basic_namespace template
 
 Use paster::
 
-    >>> paster('create -t basic_namespace plone.example --no-interactive')
-    paster create -t basic_namespace plone.example --no-interactive
+    >>> templer('basic_namespace plone.example --no-interactive')
+    templer basic_namespace plone.example --no-interactive
     ...
 
 Check the top-level package structure::
@@ -24,7 +24,6 @@ Check the src directory structure::
     >>> src_dir = os.path.join('plone.example', 'src')
     >>> ls(src_dir)
     plone
-    plone.example.egg-info
 
 The default license for our this template is the GPL, make sure that the GPL is 
 the license that was actually created::

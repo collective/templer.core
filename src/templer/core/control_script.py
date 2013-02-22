@@ -291,21 +291,21 @@ class Runner(object):
         argv should be passed in as sys.argv[1:]
         """
         try:
-            template_name, output_name, opts = self._process_args(argv)
+            template_name, output_name, args = self._process_args(argv)
         except SyntaxError, e:
-            self.usage(exit=False)
+            self.usage()
             msg = "ERROR: There was a problem with your arguments: %s\n"
             print msg % str(e)
-            sys.exit(1)
+            return 1
 
         rez = pkg_resources.iter_entry_points(
                 'paste.paster_create_template',
                 template_name)
         rez = list(rez)
         if not rez:
-            self.usage(exit=False)
+            self.usage()
             print "ERROR: No such template: %s\n" % template_name
-            sys.exit(1)
+            return 1
 
         template = rez[0].load()
         print "\n%s: %s" % (template_name, template.summary)
@@ -330,7 +330,7 @@ class Runner(object):
                     self._checkdots(template, output_name)
                 except ValueError, e:
                     print "ERROR: %s\n" % str(e)
-                    sys.exit(1)
+                    return 1
             else:
                 ndots = getattr(template, 'ndots', None)
                 help = DOT_HELP.get(ndots)
@@ -342,7 +342,7 @@ class Runner(object):
                         output_name = command.challenge(challenge)
                         if output_name == 'q':
                             print "\n\nExiting...\n"
-                            sys.exit(0)
+                            return 0
                         self._checkdots(template, output_name)
                     except ValueError, e:
                         print "\nERROR: %s" % e
@@ -351,29 +351,24 @@ class Runner(object):
 
             print self.texts['help_prompt']
 
-        optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
-        if output_name is not None:
-            optslist.insert(0, output_name)
         try:
-            command.run(['-q', '-t', template_name] + optslist + special_args)
+            command.run(['-q', '-t', template_name] + args + special_args)
         except KeyboardInterrupt:
             print "\n\nExiting...\n"
-            sys.exit(0)
+            return 0
         except Exception, e:
             print "\nERROR: %s\n" % str(e)
-            sys.exit(1)
-        sys.exit(0)
+            return 1
+        return 0
 
     # Public API methods, can be overridden by templer-based applications
     def show_help(self):
         """display help text"""
         print self.texts['description'] % {'script_name': self.name}
-        sys.exit(0)
+        return 0
 
     def generate_dotfile(self):
         """generate a dotfile to hold default values
-
-        method must exit by raising error or calling sys.exit
         """
 
         cats = list_sorted_templates(scope=self.allowed_packages)
@@ -385,12 +380,10 @@ class Runner(object):
                 if hasattr(var, 'pretty_description'):
                     print "# %s" % var.pretty_description()
                 print "# %s = %s\n" % (var.name, var.default)
-        sys.exit(0)
+        return 0
 
     def list_verbose(self):
         """list available templates and their help text
-
-        method must exit by raising error or calling sys.exit
         """
         textwrapper = TextWrapper(
             initial_indent="   ", subsequent_indent="   ")
@@ -414,22 +407,18 @@ class Runner(object):
         else:
             print self.texts['not_here_warning']
 
-        sys.exit(0)
+        return 0
 
     def show_version(self):
         """show installed version of packages listed in self.versions
-
-        method must exit by raising error or calling sys.exit
         """
         version_info = self._get_version_info()
         print self._format_version_info(
             version_info, "Installed Templer Packages")
-        sys.exit(0)
+        return 0
 
-    def usage(self, exit=True):
+    def usage(self):
         """print usage message
-
-        method must exit by raising error or calling sys.exit
         """
         templates = self._list_printable_templates()
         local = ''
@@ -440,8 +429,8 @@ class Runner(object):
                                      'local': local,
                                      'script_name': self.name,
                                      'dotfile_name': self.dotfile}
-        if exit:
-            sys.exit(0)
+        return 0
+            
 
     # Private API supporting command-line flags
     # should not need to be changed by templer-based applications
@@ -519,18 +508,13 @@ class Runner(object):
         except IndexError:
             raise SyntaxError('No template name provided')
         output_name = None
-        others = {}
         for arg in args:
             eq_index = arg.find('=')
             if eq_index == -1 and not output_name:
                 output_name = arg
-            elif eq_index > 0:
-                key, val = arg.split('=')
-                others[key] = val
-            else:
-                raise SyntaxError(arg)
+                break
 
-        return template_name, output_name, others
+        return template_name, output_name, args
 
     def _checkdots(self, template, name):
         """Check if project name appears legal, given template requirements.
@@ -616,32 +600,40 @@ class Runner(object):
 templer_runner = Runner()
 
 
-def run(runner=templer_runner):
+def run(*args, **kw):
 
-    if len(sys.argv) == 1:
+    if 'runner' in kw:
+        runner = kw['runner']
+    else:
+        runner = templer_runner
+
+    if args:
+        args = list(args)
+    else:
+        args = sys.argv[1:]
+
+    if not len(args):
         runner.usage()
 
     # Relay the 'add' command to templer.localcommands
-    if HAS_LOCAL_COMMANDS and sys.argv[1] == 'add':
+    if HAS_LOCAL_COMMANDS and args[0] == 'add':
         runner = TemplerLocalCommand('add')
-        runner.run(sys.argv[2:])
+        runner.run(args[1:])
         return
 
-    if "--force" in sys.argv:
+    if "--force" in args:
         runner.allowed_packages = 'all'
-        pass
 
-    if "--help" in sys.argv:
-        runner.show_help()
+    if "--help" in args:
+        exit_code = runner.show_help()
+    elif "--make-config-file" in args:
+        exit_code = runner.generate_dotfile()
+    elif "--list" in args:
+        exit_code = runner.list_verbose()
+    elif "--version" in args:
+        exit_code = runner.show_version()
+    else:
+        exit_code = runner(args)
 
-    if "--make-config-file" in sys.argv:
-        runner.generate_dotfile()
-
-    if "--list" in sys.argv:
-        runner.list_verbose()
-
-    if "--version" in sys.argv:
-        runner.show_version()
-
-    args = sys.argv[1:]
-    runner(args)
+    if kw.get('exit', True):
+        sys.exit(exit_code)
