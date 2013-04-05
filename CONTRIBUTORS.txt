@@ -4,6 +4,8 @@
 - Domen Kožar
 - Jan Murre
 - Maik Röder
+- David Glick
+- Fulvio Casali
 
 Based on code from zopeskel, contributors to which include:
 

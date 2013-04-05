@@ -4,6 +4,21 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
+
+- Allow use of ``templer`` as a command for testing purposes
+  [davisagli]
+
+- Remove all code supporting automatic adding of SVN repositories
+  [davisagli]
+
+- Local commands can now be run using ``bin/templer add``
+  if templer.localcommands is present.
+  [davisagli]
+
+- Don't run the setuptools egg_info command as part of running a template.
+  This avoids installing package dependencies in ways that can be problematic.
+  [davisagli]
+
 - Non specific number of name spaces
   [maikroeder]
 

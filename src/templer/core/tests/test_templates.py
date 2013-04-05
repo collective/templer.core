@@ -20,26 +20,15 @@ def rmdir(*args):
         shutil.rmtree(dirname)
 
 
-def paster(cmd):
-    print "paster %s" % cmd
-    from paste.script import command
-    #the overwite option for the create command defaults to True
-    #but in the paste.script.command it defaults to False.
-    #so we fixe it here
-    if 'create' in cmd:
-        cmd += " --overwrite=1"
+def templer(cmd):
+    print "templer %s" % cmd
+    from templer.core.control_script import run
     args = cmd.split()
-    options, args = command.parser.parse_args(args)
-    options.base_parser = command.parser
-    command.system_plugins.extend(options.plugins or [])
-    commands = command.get_commands()
-    command_name = args[0]
-    if command_name not in commands:
-        command = command.NotFoundCommand
-    else:
-        command = commands[command_name].load()
-    runner = command(command_name)
-    runner.run(args[1:])
+    run(*args, exit=False)
+
+
+# BBB
+paster = templer
 
 
 def read_sh(cmd):

@@ -1,18 +1,25 @@
 import sys
+import os
+import ConfigParser
 import pkg_resources
 from cStringIO import StringIO
 from textwrap import TextWrapper
 
-from paste.script.command import get_commands
-
 from templer.core.base import wrap_help_paras
+from templer.core.create import CreateDistroCommand
 from templer.core.ui import list_sorted_templates
+
+try:
+    from templer.localcommands.command import TemplerLocalCommand
+    HAS_LOCAL_COMMANDS = True
+except ImportError:
+    HAS_LOCAL_COMMANDS = False
 
 
 def get_templer_packages():
     """return a list of the templer namespace packages currently installed"""
-    templer_packages = [k for k in pkg_resources.working_set.by_key.keys()\
-        if 'templer' in k.lower()]
+    templer_packages = [k for k in pkg_resources.working_set.by_key.keys()
+                        if 'templer' in k.lower()]
 
     return templer_packages
 
@@ -20,16 +27,16 @@ def get_templer_packages():
 USAGE = """
 Usage:
 
-    %(script_name)s <template> <output-name> [var1=value] ... [varN=value]
+    %(script_name)s %(local)s<template> <output-name> [var1=value] ... [varN=value]
 
     %(script_name)s --help                Full help
     %(script_name)s --list                List template verbosely, with details
+    %(script_name)s --force               Ignore whether we are in a project
     %(script_name)s --make-config-file    Output %(dotfile_name)s prefs file
     %(script_name)s --version             Print versions of installed templer
                                           packages
 
 %(templates)s
-Warning:  use of the --svn-repository argument is not allowed with this script
 
 For further help information, please invoke this script with the
 option "--help".
@@ -80,6 +87,31 @@ feature mostly useful for scripted use of this::
 To get the list of variables that a template expects, you can ask for
 this with ``%(script_name)s  <template> --list-variables``).
 
+Local commands::
+
+    %(script_name)s <local-command> <template>
+
+If a project you create with ``%(script_name)s`` supports local commands, you
+will be notified of this during its creation.
+In this case, running ``%(script_name)s`` again inside the package's directory
+will list the available local commands and templates.
+
+For example::
+
+    %(script_name)s add behavior
+
+The above example would apply if you had created a dexterity project, and
+then changed to the ``src`` directory inside it before running the local
+command ``%(script_name)s add`` to add further skeletons to the same project.
+
+Note::
+
+Since it would not make a lot of sense to create a project inside another
+product or distribution (except perhaps inside a buildout), the list of
+available templates or local commands that is shown in the usage message or
+verbose list depends on the context (i.e. directory).  If local commands are
+not available, a warning message will be displayed to indicate that
+``%(script_name)s`` should not be run in the context of a product.
 
 Interactive Help
 ----------------
@@ -199,13 +231,16 @@ If at any point, you need additional help for a question, you can enter
 """
 
 
-SVN_WARNING = """
-For a number of reasons, the --svn-repository argument is not supported
-with the %s script. Try --help for more information.
-"""
-
-
 ID_WARNING = "Not a valid Python dotted name: %s ('%s' is not an identifier)"
+
+
+NOT_HERE_WARNING = """
+======================================================
+You are in a templer-generated distribution already.
+It's probably not a good idea to add another one here!
+Use --force to override.
+======================================================
+"""
 
 
 class Runner(object):
@@ -219,13 +254,15 @@ class Runner(object):
         'dot_help': DOT_HELP,
         'dotfile_header': DOTFILE_HEADER,
         'help_prompt': HELP_PROMPT,
-        'svn_warning': SVN_WARNING,
         'id_warning': ID_WARNING,
+        'not_here_warning': NOT_HERE_WARNING,
     }
     name = 'templer'
     dotfile = '.zopeskel'
+    allowed_packages = 'all'
 
-    def __init__(self, name=None, versions=None, dotfile=None, texts={}):
+    def __init__(self, name=None, versions=None, dotfile=None, texts={},
+                 context_aware=True):
         """initialize a runner with the given name"""
         if name is not None:
             self.name = name
@@ -245,28 +282,30 @@ class Runner(object):
             raise ValueError("If passed, texts argument must be a dict")
         self.texts.update(texts)
 
+        if context_aware:
+            self.allowed_packages = self._context_awareness()
+
     def __call__(self, argv):
         """command-line interaction and template execution
 
         argv should be passed in as sys.argv[1:]
         """
         try:
-            template_name, output_name, opts = self._process_args(argv)
+            template_name, output_name, args = self._process_args(argv)
         except SyntaxError, e:
-            self.usage(exit=False)
+            self.usage()
             msg = "ERROR: There was a problem with your arguments: %s\n"
             print msg % str(e)
             raise
-            sys.exit(1)
 
         rez = pkg_resources.iter_entry_points(
                 'paste.paster_create_template',
                 template_name)
         rez = list(rez)
         if not rez:
-            self.usage(exit=False)
+            self.usage()
             print "ERROR: No such template: %s\n" % template_name
-            sys.exit(1)
+            return 1
 
         template = rez[0].load()
         print "\n%s: %s" % (template_name, template.summary)
@@ -274,8 +313,7 @@ class Runner(object):
         if help:
             print template.help
 
-        create = get_commands()['create'].load()
-        command = create('create')
+        command = CreateDistroCommand()
 
         # allow special runner processing to be bypassed in case of certain
         # standard paster args
@@ -293,7 +331,6 @@ class Runner(object):
                 except ValueError, e:
                     print "ERROR: %s\n" % str(e)
                     raise
-                    sys.exit(1)
             else:
                 ndots = getattr(template, 'ndots', None)
                 help = DOT_HELP.get(ndots)
@@ -305,7 +342,7 @@ class Runner(object):
                         output_name = command.challenge(challenge)
                         if output_name == 'q':
                             print "\n\nExiting...\n"
-                            sys.exit(0)
+                            return 0
                         self._checkdots(template, output_name)
                     except ValueError, e:
                         print "\nERROR: %s" % e
@@ -315,33 +352,27 @@ class Runner(object):
 
             print self.texts['help_prompt']
 
-        optslist = ['%s=%s' % (k, v) for k, v in opts.items()]
-        if output_name is not None:
-            optslist.insert(0, output_name)
         try:
-            command.run(['-q', '-t', template_name] + optslist + special_args)
+            command.run(['-q', '-t', template_name] + args + special_args)
         except KeyboardInterrupt:
             print "\n\nExiting...\n"
-            sys.exit(0)
+            return 0
         except Exception, e:
             print "\nERROR: %s\n" % str(e)
             raise
-            sys.exit(1)
-        sys.exit(0)
+        return 0
 
     # Public API methods, can be overridden by templer-based applications
     def show_help(self):
         """display help text"""
         print self.texts['description'] % {'script_name': self.name}
-        sys.exit(0)
+        return 0
 
     def generate_dotfile(self):
         """generate a dotfile to hold default values
-
-        method must exit by raising error or calling sys.exit
         """
 
-        cats = list_sorted_templates()
+        cats = list_sorted_templates(scope=self.allowed_packages)
         print self.texts['dotfile_header'] % {'script_name': self.name}
         for temp in sum(cats.values(), []):
             print "\n[%(name)s]\n" % temp
@@ -350,48 +381,57 @@ class Runner(object):
                 if hasattr(var, 'pretty_description'):
                     print "# %s" % var.pretty_description()
                 print "# %s = %s\n" % (var.name, var.default)
-        sys.exit(0)
+        return 0
 
     def list_verbose(self):
         """list available templates and their help text
-
-        method must exit by raising error or calling sys.exit
         """
         textwrapper = TextWrapper(
             initial_indent="   ", subsequent_indent="   ")
-        cats = list_sorted_templates()
+        cats = list_sorted_templates(scope=self.allowed_packages)
+        if cats:
+            for title, items in cats.items():
+                print "\n"+ title
+                print "-" * len(title)
+                # Hard-coded for now, since 'add' is the only one
+                if title == 'Local Commands':
+                    print '\nadd: Allows the addition of further templates'\
+                          ' from the following list'
+                    print '     to an existing package\n'
+                    print '\nLocal Templates'
+                    print '-----------------'
+                for temp in items:
+                    print "\n%s: %s\n" % (temp['name'], temp['summary'])
+                    if temp['help']:
+                        wrap_help_paras(textwrapper, temp['help'])
+            print
+        else:
+            print self.texts['not_here_warning']
 
-        for title, items in cats.items():
-            print "\n"+ title
-            print "-" * len(title)
-            for temp in items:
-                print "\n%s: %s\n" % (temp['name'], temp['summary'])
-                if temp['help']:
-                    wrap_help_paras(textwrapper, temp['help'])
-        print
-        sys.exit(0)
+        return 0
 
     def show_version(self):
         """show installed version of packages listed in self.versions
-
-        method must exit by raising error or calling sys.exit
         """
         version_info = self._get_version_info()
         print self._format_version_info(
             version_info, "Installed Templer Packages")
-        sys.exit(0)
+        return 0
 
-    def usage(self, exit=True):
+    def usage(self):
         """print usage message
-
-        method must exit by raising error or calling sys.exit
         """
         templates = self._list_printable_templates()
+        local = ''
+        if self.allowed_packages in ['all', 'local']:
+            local = '[<local-command>] '
+
         print self.texts['usage'] % {'templates': templates,
+                                     'local': local,
                                      'script_name': self.name,
                                      'dotfile_name': self.dotfile}
-        if exit:
-            sys.exit(0)
+        return 0
+            
 
     # Private API supporting command-line flags
     # should not need to be changed by templer-based applications
@@ -435,16 +475,25 @@ class Runner(object):
         Printable list of all templates, sorted into categories.
         """
         s = StringIO()
-        cats = list_sorted_templates()
-        templates = sum(cats.values(), [])   # flatten into single list
-        max_name = max([len(x['name']) for x in templates])
-        for title, items in cats.items():
-            print >>s, "\n%s\n" % title
-            for entry in items:
-                print >>s, "|  %s:%s %s\n" % (
-                     entry['name'],
-                    ' '*(max_name-len(entry['name'])),
-                    entry['summary']),
+        cats = list_sorted_templates(scope=self.allowed_packages)
+        if cats:
+            templates = sum(cats.values(), [])   # flatten into single list
+            max_name = max([len(x['name']) for x in templates])
+            for title, items in cats.items():
+                print >>s, "\n%s\n" % title
+                # Hard-coded for now, since 'add' is the only one
+                if title == 'Local Commands':
+                    print >>s, "|  add: Allows the addition of further"\
+                          " templates from the following list"
+                    print >>s, "        to an existing package\n"
+                for entry in items:
+                    print >>s, "|  %s:%s %s\n" % (
+                         entry['name'],
+                        ' '*(max_name-len(entry['name'])),
+                        entry['summary']),
+        else:
+            print >>s, self.texts['not_here_warning']
+
         s.seek(0)
         return s.read()
 
@@ -460,33 +509,13 @@ class Runner(object):
         except IndexError:
             raise SyntaxError('No template name provided')
         output_name = None
-        others = {}
         for arg in args:
             eq_index = arg.find('=')
             if eq_index == -1 and not output_name:
                 output_name = arg
-            elif eq_index > 0:
-                key, val = arg.split('=')
-                # the --svn-repository argument to paster does some things that
-                # cause it to be pretty much incompatible with zopeskel. See
-                # the following zopeskel issues:
-                #     http://plone.org/products/zopeskel/issues/35
-                #     http://plone.org/products/zopeskel/issues/34
-                # For this reason, we are going to disallow using the
-                # --svn-repository argument when using the zopeskel wrapper.
-                #
-                # Those who wish to use it can still do so by going back to
-                # paster, with the caveat that there are some templates
-                # (particularly the buildout ones) for which the argument will
-                # always throw errors (at least until the problems are fixed
-                # upstream in paster itself).
-                if 'svn-repository' in key:
-                    raise SyntaxError(self.texts['svn_warning'] % self.name)
-                others[key] = val
-            else:
-                raise SyntaxError(arg)
+                break
 
-        return template_name, output_name, others
+        return template_name, output_name, args
 
     def _checkdots(self, template, name):
         """Check if project name appears legal, given template requirements.
@@ -502,26 +531,99 @@ class Runner(object):
             raise ValueError("Five dots should be more than enough, "
                              "no black hole please")
 
+    def _context_awareness(self):
+        """Check whether we are running inside a distribution already.
+
+        It makes no sense to create a distribution inside another
+        templer-generated distribution, unless maybe when it's a buildout.  So
+        we return one of three strings:
+        - "global":  outside of any distribution; this means the normal
+        templates are available
+        - "local":  inside another distibution;  only local commands are
+        allowed
+        - "none":  inside another distribution that does not have any local
+        commands
+        - "all":   default initial value for self.allowed_packages, never
+        returned by this method.
+        """
+        cwd = os.getcwd()
+        templer_script = os.path.abspath(os.path.join(os.getcwd(),sys.argv[0]))
+        templer_home = os.path.commonprefix([cwd, templer_script])
+        templer_home = os.path.dirname(templer_home) # strips the trailing
+                                    # separator, unless it's already the root.
+
+        parent_template = None
+        made_by_templer = False
+
+        # walk back up the path to find out if we are in a templer-generated
+        # distribution, and if it has local commands
+        while cwd != templer_home:
+            changes_txt = os.path.join(cwd, 'CHANGES.txt')
+            setup_cfg = os.path.join(cwd, 'setup.cfg')
+
+            if os.path.exists(setup_cfg):
+                parser = ConfigParser.ConfigParser()
+                parser.read(setup_cfg)
+                try:
+                    parent_template =\
+                        parser.get('templer.local', 'template') or None
+                except:
+                    pass
+
+            if parent_template and HAS_LOCAL_COMMANDS:
+                return 'local'
+
+            if os.path.exists(changes_txt):
+                f = open(changes_txt, 'rb')
+                content = f.read()
+                f.close()
+                if 'Package created using templer' in content:
+                    made_by_templer = True
+
+            (cwd, tail) = os.path.split(cwd)
+
+        if made_by_templer:
+            return 'none'
+
+        return 'global'
 
 templer_runner = Runner()
 
 
-def run(runner=templer_runner):
+def run(*args, **kw):
 
-    if "--help" in sys.argv:
-        runner.show_help()
+    if 'runner' in kw:
+        runner = kw['runner']
+    else:
+        runner = templer_runner
 
-    if "--make-config-file" in sys.argv:
-        runner.generate_dotfile()
+    if args:
+        args = list(args)
+    else:
+        args = sys.argv[1:]
 
-    if "--list" in sys.argv:
-        runner.list_verbose()
-
-    if "--version" in sys.argv:
-        runner.show_version()
-
-    if len(sys.argv) == 1:
+    if not len(args):
         runner.usage()
 
-    args = sys.argv[1:]
-    runner(args)
+    # Relay the 'add' command to templer.localcommands
+    if HAS_LOCAL_COMMANDS and args[0] == 'add':
+        runner = TemplerLocalCommand('add')
+        runner.run(args[1:])
+        return
+
+    if "--force" in args:
+        runner.allowed_packages = 'all'
+
+    if "--help" in args:
+        exit_code = runner.show_help()
+    elif "--make-config-file" in args:
+        exit_code = runner.generate_dotfile()
+    elif "--list" in args:
+        exit_code = runner.list_verbose()
+    elif "--version" in args:
+        exit_code = runner.show_version()
+    else:
+        exit_code = runner(args)
+
+    if kw.get('exit', True):
+        sys.exit(exit_code)
