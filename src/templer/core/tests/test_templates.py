@@ -20,11 +20,14 @@ def rmdir(*args):
         shutil.rmtree(dirname)
 
 
-def templer(cmd):
+def templer(cmd, runner=None):
     print "templer %s" % cmd
     from templer.core.control_script import run
     args = cmd.split()
-    run(*args, exit=False)
+    kwargs = {'exit': False}
+    if runner is not None:
+        kwargs['runner'] = runner
+    run(*args, **kwargs)
 
 
 # BBB
