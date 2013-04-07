@@ -90,6 +90,26 @@ class test_control(unittest.TestCase):
         output = run()
         self.assertTrue('Usage:' in output)
 
+    def test_script_no_localcommands(self):
+        import templer.core.control_script
+        old_has_local = templer.core.control_script.HAS_LOCAL_COMMANDS
+        templer.core.control_script.HAS_LOCAL_COMMANDS = False
+        output = run(*['add', 'foo'])
+        templer.core.control_script.HAS_LOCAL_COMMANDS = old_has_local
+
+        comp = self.runner.texts['no_localcommands_warning']
+        self.assertTrue(comp in output)
+
+    def test_script_localcommands_wrong_context(self):
+        import templer.core.control_script
+        old_has_local = templer.core.control_script.HAS_LOCAL_COMMANDS
+        templer.core.control_script.HAS_LOCAL_COMMANDS = True
+        output = run(*['add', 'foo'])
+        templer.core.control_script.HAS_LOCAL_COMMANDS = old_has_local
+
+        comp = self.runner.texts['not_local_context_warning']
+        self.assertTrue(comp in output)
+
     def test_show_help(self):
         # --help produces the DESCRIPTION string
         args = ['templer', '--help']
