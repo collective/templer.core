@@ -242,6 +242,23 @@ Use --force to override.
 ======================================================
 """
 
+NO_LOCALCOMMANDS_WARNING = """
+You have invoked the 'add' command, which runs localcommands, but you have
+not installed support for localcommands.
+
+The simplest way to install support for localcommands is to install a templer
+package which has a localcommands extra, such as templer.plone:
+
+    $ easy_install templer.plone[localcommands]
+"""
+
+NOT_LOCAL_CONTEXT_WARNING = """
+You have invoked the 'add' command, which runs localcommands, but you are not
+in a context where this is appropriate.  If you have just generated a new
+package which supports localcommands, change directories so that you are in
+the same location as the ``setup.py`` file for that package and try again.
+"""
+
 
 class Runner(object):
     """encapsulates command-line interactions
@@ -256,6 +273,8 @@ class Runner(object):
         'help_prompt': HELP_PROMPT,
         'id_warning': ID_WARNING,
         'not_here_warning': NOT_HERE_WARNING,
+        'no_localcommands_warning': NO_LOCALCOMMANDS_WARNING,
+        'not_local_context_warning': NOT_LOCAL_CONTEXT_WARNING,
     }
     name = 'templer'
     dotfile = '.zopeskel'
@@ -431,7 +450,38 @@ class Runner(object):
                                      'script_name': self.name,
                                      'dotfile_name': self.dotfile}
         return 0
-            
+
+    def no_locals(self):
+        print self.texts['no_localcommands_warning']
+
+    def run_localcommand(self, args):
+        # a local command is being invoked,  There are possible situations:
+        # 1.  local command support is not installed, must fail and report
+        # 2.  local command support is available, but we are not in a context
+        #     where local commands are viable, must fail and report
+        # 3.  local command support is available, and we are in an appropriate
+        #     context, but there are no local commands available
+        #     We should pass the command in to a local command runner, if 
+        #     an option such as --list or --list-all is present, otherwise,
+        #     must fail and report.
+        # 4.  local command support is available and we are in an appropriate
+        #     context, and local commands are present, we should attempt to
+        #     run them.
+        if HAS_LOCAL_COMMANDS:
+            if self.allowed_packages == 'global':
+                # Situation 2, fail and report
+                print self.texts['not_local_context_warning']
+                return 1
+            else:
+                # responsibility for handling situations 3 & 4 should be
+                # delegated to the templer local command itself:
+                runner = TemplerLocalCommand('add')
+                exit_code = runner.run(args[1:])
+                return exit_code
+        else:
+            # situation 1, fail and report.
+            print self.texts['no_localcommands_warning']
+            return 1
 
     # Private API supporting command-line flags
     # should not need to be changed by templer-based applications
@@ -587,6 +637,7 @@ class Runner(object):
 
         return 'global'
 
+
 templer_runner = Runner()
 
 
@@ -605,16 +656,13 @@ def run(*args, **kw):
     if not len(args):
         runner.usage()
 
-    # Relay the 'add' command to templer.localcommands
-    if HAS_LOCAL_COMMANDS and args[0] == 'add':
-        runner = TemplerLocalCommand('add')
-        runner.run(args[1:])
-        return
-
+    # this can effect the result of invoking local commands, do it first
     if "--force" in args:
         runner.allowed_packages = 'all'
 
-    if "--help" in args:
+    if args[0] == 'add':
+        exit_code = runner.run_localcommand(args)
+    elif "--help" in args:
         exit_code = runner.show_help()
     elif "--make-config-file" in args:
         exit_code = runner.generate_dotfile()
