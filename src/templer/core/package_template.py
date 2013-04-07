@@ -1,7 +1,7 @@
 import os
 import copy
 
-from paste.script import templates
+from templer.core.base import Template
 from templer.core.base import BaseTemplate
 from templer.core.base import get_var
 from templer.core.base import LICENSE_CATEGORIES
@@ -220,14 +220,14 @@ the safest answer is False.
 
     def run(self, command, output_dir, vars):
         self._template_dir = self._outer_template_dir
-        templates.Template.run(self, command, output_dir, vars)
+        Template.run(self, command, output_dir, vars)
         output_dir = os.path.join(
             *([vars['egg'], 'src'] + vars['egg'].split('.')))
 
         self._template_dir = self._inner_template_dir
         _old_required_structures=self.required_structures
         self.required_structures=[]
-        templates.Template.run(self, command, output_dir, vars)
+        Template.run(self, command, output_dir, vars)
         self.required_structures = _old_required_structures
 
     def check_vars(self, vars, command):
