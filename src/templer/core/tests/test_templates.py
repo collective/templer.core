@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import tempfile
 
+from templer.core.tests.test_script import capture_stdout
+
 current_dir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -20,14 +22,17 @@ def rmdir(*args):
         shutil.rmtree(dirname)
 
 
-def templer(cmd, runner=None):
-    print "templer %s" % cmd
+def templer(cmd, runner=None, silent=False):
+    if not silent:
+        print "templer %s" % cmd
     from templer.core.control_script import run
     args = cmd.split()
     kwargs = {'exit': False}
     if runner is not None:
         kwargs['runner'] = runner
-    run(*args, **kwargs)
+    if silent:
+        run = capture_stdout(run)
+    return run(*args, **kwargs)
 
 
 # BBB
