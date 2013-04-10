@@ -7,10 +7,10 @@ import tempfile
 import shutil
 import datetime
 
-from paste.script.command import get_commands
-
 from templer.core.base import BaseTemplate
 from templer.core.base import LICENSE_CATEGORIES
+from templer.core.create import CreateDistroCommand
+
 
 LICENSE_EXPECTATIONS = {
     'agpl3': ['LICENSE.txt', ],
@@ -43,8 +43,7 @@ class TestLicenses(unittest.TestCase):
             'license_name': 'GPL',
             'project': 'my.package',
         }
-        create = get_commands()['create'].load()
-        command = create('create')
+        command = CreateDistroCommand()
         command.parse_args(['-t', 'nested_namespace'])
         self.command = command
         self.command.interactive = False

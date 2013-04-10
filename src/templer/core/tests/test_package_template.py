@@ -4,9 +4,8 @@ import unittest2 as unittest
 import pkg_resources
 import shutil
 
-from paste.script.command import get_commands
-
 from templer.core.base import BaseTemplate
+from templer.core.create import CreateDistroCommand
 from templer.core.vars import DottedVar
 from templer.core.vars import EXPERT
 
@@ -28,8 +27,7 @@ class TestPackageTemplate(unittest.TestCase):
                       title="String Title", default="string", page='Carl',
                       modes=(EXPERT)), ]
         self.template = BaseTemplate('my_name')
-        create = get_commands()['create'].load()
-        command = create('create')
+        command = CreateDistroCommand()
         command.parse_args(['-t', 'package'])
         command.interactive = False
         self.command = command

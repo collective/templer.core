@@ -2,9 +2,8 @@
 
 import unittest2 as unittest
 
-from paste.script.command import get_commands
-
 from templer.core.base import BaseTemplate, get_var
+from templer.core.create import CreateDistroCommand
 from templer.core.vars import var
 from templer.core.vars import BooleanVar
 from templer.core.vars import StringVar
@@ -39,8 +38,7 @@ class test_base_template(unittest.TestCase):
             DottedVar('dot_var', 'This is a dotted variable',
                       title="Dotted Title", default="dotted.variable")]
         self.template = BaseTemplate('my_name')
-        create = get_commands()['create'].load()
-        command = create('create')
+        command = CreateDistroCommand()
         command.parse_args(['-t', 'nested_namespace'])
         self.command = command
 
