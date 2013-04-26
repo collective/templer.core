@@ -4,6 +4,8 @@ Changelog
 1.0b5 (unreleased)
 ------------------
 
+- Remove unused code which read vars from compiled cheetah templates
+  [cewing]
 
 - Allow use of ``templer`` as a command for testing purposes
   [davisagli]

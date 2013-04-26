@@ -1,4 +1,3 @@
-import inspect
 import os
 import sys
 import pkg_resources
@@ -7,7 +6,6 @@ from copy import copy
 from textwrap import TextWrapper
 import ConfigParser
 from ConfigParser import SafeConfigParser
-import Cheetah.Template
 
 from templer.core import pluginlib
 from templer.core import copydir
@@ -85,108 +83,38 @@ def update_setup_cfg(path, section, option, value):
 _skip_variables = ['VFN', 'currentTime', 'self', 'VFFSL', 'dummyTrans',
                    'getmtime', 'trans']
 
-def find_args_in_template(template):
-    if isinstance(template, (str, unicode)):
-        # Treat as filename:
-        template = Cheetah.Template.Template(file=template)
-    if not hasattr(template, 'body'):
-        # Don't know...
-        return None
-    method = template.body
-    args, varargs, varkw, defaults = inspect.getargspec(method)
-    defaults=list(defaults or [])
-    vars = []
-    while args:
-        if len(args) == len(defaults):
-            default = defaults.pop(0)
-        else:
-            default = NoDefault
-        arg = args.pop(0)
-        if arg in _skip_variables:
-            continue
-        # @@: No way to get description yet
-        vars.append(
-            var(arg, description=None,
-                default=default))
-    return vars
 
-def find_args_in_dir(dir, verbose=False):
-    all_vars = {}
-    for fn in os.listdir(dir):
-        if fn.startswith('.') or fn == 'CVS' or fn == '_darcs':
-            continue
-        full = os.path.join(dir, fn)
-        if os.path.isdir(full):
-            inner_vars = find_args_in_dir(full)
-        elif full.endswith('_tmpl'):
-            inner_vars = {}
-            found = find_args_in_template(full)
-            if found is None:
-                # Couldn't read variables
-                if verbose:
-                    print 'Template %s has no parseable variables' % full
-                continue
-            for var in found:
-                inner_vars[var.name] = var
-        else:
-            # Not a template, don't read it
-            continue
-        if verbose:
-            print 'Found variable(s) %s in Template %s' % (
-                ', '.join(inner_vars.keys()), full)
-        for var_name, var in inner_vars.items():
-            # Easy case:
-            if var_name not in all_vars:
-                all_vars[var_name] = var
-                continue
-            # Emit warnings if the variables don't match well:
-            cur_var = all_vars[var_name]
-            if not cur_var.description:
-                cur_var.description = var.description
-            elif (cur_var.description and var.description
-                  and var.description != cur_var.description):
-                print >> sys.stderr, (
-                    "Variable descriptions do not match: %s: %s and %s"
-                    % (var_name, cur_var.description, var.description))
-            if (cur_var.default is not NoDefault
-                and var.default is not NoDefault
-                and cur_var.default != var.default):
-                print >> sys.stderr, (
-                    "Variable defaults do not match: %s: %r and %r"
-                    % (var_name, cur_var.default, var.default))
-    return all_vars
-
-class Template(object):
+class Template(object): # pragma: no cover
     # Subclasses must define:
     # _template_dir (or template_dir())
     # summary
 
     # Variables this template uses (mostly for documentation now)
     # a list of instances of var()
-    vars = []
+    vars = [] # pragma: no cover
 
     # Eggs that should be added as plugins:
-    egg_plugins = []
+    egg_plugins = [] # pragma: no cover
 
     # Templates that must be applied first:
-    required_templates = []
+    required_templates = [] # pragma: no cover
 
     # Use Cheetah for substituting templates:
-    use_cheetah = False
+    use_cheetah = False # pragma: no cover
     # If true, then read all the templates to find the variables:
-    read_vars_from_templates = False
+    read_vars_from_templates = False # pragma: no cover
 
     # You can also give this function/method to use something other
     # than Cheetah or string.Template.  The function should be of the
     # signature template_renderer(content, vars, filename=filename).
     # Careful you don't turn this into a method by putting a function
     # here (without staticmethod)!
-    template_renderer = None
+    template_renderer = None # pragma: no cover
 
     def __init__(self, name):
         self.name = name
         self._read_vars = None
-    
+
     def module_dir(self):
         """Returns the module directory of this template."""
         mod = sys.modules[self.__class__.__module__]
@@ -213,26 +141,27 @@ class Template(object):
         converted_vars = {}
         unused_vars = vars.copy()
         errors = []
-        for var in expect_vars:
-            if var.name not in unused_vars:
+        for var_ in expect_vars:
+            if var_.name not in unused_vars:
                 if cmd.interactive:
-                    prompt = 'Enter %s' % var.full_description()
-                    response = cmd.challenge(prompt, var.default, var.should_echo)
+                    prompt = 'Enter %s' % var_.full_description()
+                    response = cmd.challenge(prompt, var_.default,
+                                             var_.should_echo)
                     converted_vars[var.name] = response
-                elif var.default is NoDefault:
+                elif var_.default is NoDefault:
                     errors.append('Required variable missing: %s'
-                                  % var.full_description())
+                                  % var_.full_description())
                 else:
-                    converted_vars[var.name] = var.default
+                    converted_vars[var_.name] = var_.default
             else:
-                converted_vars[var.name] = unused_vars.pop(var.name)
+                converted_vars[var_.name] = unused_vars.pop(var_.name)
         if errors:
             raise BadCommand(
                 'Errors in variables:\n%s' % '\n'.join(errors))
         converted_vars.update(unused_vars)
         vars.update(converted_vars)
         return converted_vars
-        
+
     def read_vars(self, command=None):
         if self._read_vars is not None:
             return self._read_vars
@@ -242,18 +171,6 @@ class Template(object):
         if not self.read_vars_from_templates:
             self._read_vars = self.vars
             return self.vars
-        
-        vars = self.vars[:]
-        var_names = [var.name for var in self.vars]
-        read_vars = find_args_in_dir(
-            self.template_dir(),
-            verbose=command and command.verbose > 1).items()
-        read_vars.sort()
-        for var_name, var in read_vars:
-            if var_name not in var_names:
-                vars.append(var)
-        self._read_vars = vars
-        return vars
 
     def write_files(self, command, output_dir, vars):
         template_dir = self.template_dir()
@@ -276,7 +193,7 @@ class Template(object):
     def print_vars(self, indent=0):
         vars = self.read_vars()
         var.print_vars(vars)
-        
+
     def pre(self, command, output_dir, vars):
         """
         Called before template is applied.
