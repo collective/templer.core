@@ -147,7 +147,8 @@ class Template(object): # pragma: no cover
                     prompt = 'Enter %s' % var_.full_description()
                     response = cmd.challenge(prompt, var_.default,
                                              var_.should_echo)
-                    converted_vars[var.name] = response
+
+                    converted_vars[var_.name] = response
                 elif var_.default is NoDefault:
                     errors.append('Required variable missing: %s'
                                   % var_.full_description())
