@@ -26,19 +26,19 @@ Check the src directory structure::
     plone
     
 
-The default license for our this template is the GPL, make sure that the GPL is 
-the license that was actually created::
+The default license for our this template is the GPL, make sure that the GPL
+is the license that was actually created::
 
     >>> license_dir = os.path.join('plone.app.example', 'docs')
     >>> ls(license_dir)
     LICENSE.GPL
     LICENSE.txt
 
-Let's look at the generated LICENSE.txt file to make sure that our author name
-and the correct package name and date were written in::
+Let's look at the generated LICENSE.txt file to make sure that the correct
+package name was written::
 
     >>> cat(license_dir, 'LICENSE.txt')
-    plone.app.example Copyright ..., <YOUR NAME HERE>
+    plone.app.example Copyright ...
     <BLANKLINE>
     ...
 

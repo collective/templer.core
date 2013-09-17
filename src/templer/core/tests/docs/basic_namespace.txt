@@ -33,11 +33,11 @@ the license that was actually created::
     LICENSE.GPL
     LICENSE.txt
 
-Let's look at the generated LICENSE.txt file to make sure that our author name
-and the correct package name and date were written in::
+Let's look at the generated LICENSE.txt file to make sure that the correct
+package name was written::
 
     >>> cat(license_dir, 'LICENSE.txt')
-    plone.example Copyright ..., <YOUR NAME HERE>
+    plone.example Copyright ...
     <BLANKLINE>
     ...
 
