@@ -637,7 +637,8 @@ def run(*args, **kw):
         args = sys.argv[1:]
 
     if not len(args):
-        runner.usage()
+        exit_code = runner.usage()
+        sys.exit(exit_code)
 
     # this can effect the result of invoking local commands, do it first
     if "--force" in args:
